@@ -59,7 +59,7 @@ h1 {
     flex-direction: row;
     justify-content: space-between;
     border: 1px solid #41414134;
-    box-shadow: 1px 1px 10px 1px #41414127;
+    box-shadow: 1px 1px 10px 1px #41414110;
     border-radius: 20px;
     padding: 15px;
     background-color: var(--secondary-color);
@@ -76,7 +76,7 @@ h1 {
     background: none;
     color: #ee3b3b;
    
-    text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.185);
+    text-shadow: 1px 1px 10px rgba(0, 0, 0, 0.096);
 }
 
 #btn-area {
