@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/autonumeric@4.9.0/dist/autoNumeric.min.js"
         integrity="sha256-T7YLdyAxufSse+BvXKbF4q4cEuPi4NyQiSxNRFz5OPY=" crossorigin="anonymous"></script>
 
-
+    <link rel="stylesheet" href="anims.css">
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
     <title>Lista de Compras</title>
@@ -28,7 +28,7 @@
                 <div class="prod-name">Feijão</div>
                 <div class="prod-qt">3</div>
             </section>
-            <button class="del-prod">
+            <button class="del-prod" class="interface-btn">
                 <span class="material-symbols-rounded">
                     delete
                 </span>
@@ -38,22 +38,45 @@
     </div>
 
     <section id="btn-area">
-        <button id="add-prod">
+        <button id="add-prod" class="interface-btn">
             <span class="material-symbols-rounded">
                 add
             </span>
         </button>
-        <button id="recover-prod">
+        <button id="recover-prod" class="interface-btn">
             <span class="material-symbols-rounded">
                 backup
             </span>
         </button>
-        <button id="clear-prod">
+        <button id="clear-prod" class="interface-btn">
             <span class="material-symbols-rounded">
                 delete_forever
             </span>
         </button>
     </section>
+    <div id="modal-add-prod" class="modal ">
+        <div class="modal-content">
+            <button id="close-modal" class="close-modal-btn">
+                <span class="material-symbols-rounded">
+                    close
+                </span>
+            </button>
+            
+            <form class="fields">
+                <h3>Adicionar Produtos</h3>
+                <div>
+                    <span>Produto:</span>
+                    <input type="text" name="prod-field" id="prod-field" placeholder="Digite o nome do produto" maxlength="20" required>
+                </div>
+                <div>
+                    <span>Quantos?</span>
+                    <input type="number" name="qtd-field" id="qtd-field" placeholder="0" min="0" required>
+                </div>
+                <button onclick="addNewProd()" id="ok-modal" class="close-modal-btn">Adicionar</button>
+            </form>
+            
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 
