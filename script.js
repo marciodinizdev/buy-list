@@ -1,8 +1,10 @@
 const interface = document.querySelector("#interface");
+const addProdBtn = document.querySelector("#add-prod");
 const addProd = document.querySelector("#add-prod");
 const delProdButtons = document.querySelectorAll('.del-prod');
 const clearProd = document.querySelector('#clear-prod');
 const closeModalBtn = document.querySelector("#close-modal");
+
 const modal = document.querySelector(".modal");
 const modalContent = document.querySelector(".modal-content");
 
