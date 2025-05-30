@@ -24,18 +24,23 @@
     <div id="interface">
         <section class="content-area">
             <section class="prod-area">
-                <div class="check">check</div>
-                <div class="prod-name">Feijão</div>
-                <div class="prod-qt">3</div>
+                <div class="left-side">
+                    <div class="check">check</div>
+                    <div class="prod-name">Caixa de leite condensado</div>
+                </div>
+                <div class="prod-qt"> - 3</div>
             </section>
             <button class="del-prod" class="interface-btn">
                 <span class="material-symbols-rounded">
                     delete
                 </span>
             </button>
+            
         </section>
-
+        <div class="confirm-msg hidden">✅ Produto adicionado!</div>
+        
     </div>
+    
 
     <section id="btn-area">
         <button id="add-prod" class="interface-btn">
@@ -54,7 +59,8 @@
             </span>
         </button>
     </section>
-    <div id="modal-add-prod" class="modal ">
+    
+    <div id="modal-add-prod" class="modal hidden">
         <div class="modal-content">
             <button id="close-modal" class="close-modal-btn">
                 <span class="material-symbols-rounded">
@@ -62,18 +68,18 @@
                 </span>
             </button>
             
-            <form class="fields">
+            <div class="fields">
                 <h3>Adicionar Produtos</h3>
                 <div>
                     <span>Produto:</span>
-                    <input type="text" name="prod-field" id="prod-field" placeholder="Digite o nome do produto" maxlength="20" required>
+                    <input type="text" name="prod-field" id="prod-field" placeholder="Digite o nome do produto" maxlength="20">
                 </div>
                 <div>
                     <span>Quantos?</span>
-                    <input type="number" name="qtd-field" id="qtd-field" placeholder="0" min="0" required>
+                    <input type="number" name="qtd-field" id="qtd-field" placeholder="0" min="0">
                 </div>
-                <button onclick="addNewProd()" id="ok-modal" class="confirm-btn">Adicionar</button>
-            </form>
+                <button id="ok-modal" class="confirm-btn">Adicionar</button>
+            </div>
             
         </div>
     </div>

@@ -1,9 +1,10 @@
 const interface = document.querySelector("#interface");
-const addProdBtn = document.querySelector("#add-prod");
+const confirmBtn = document.querySelector(".confirm-btn");
 const addProd = document.querySelector("#add-prod");
 const delProdButtons = document.querySelectorAll('.del-prod');
 const clearProd = document.querySelector('#clear-prod');
 const closeModalBtn = document.querySelector("#close-modal");
+const confirmMsg = document.querySelector(".confirm-msg");
 
 const modal = document.querySelector(".modal");
 const modalContent = document.querySelector(".modal-content");
@@ -44,22 +45,7 @@ function createProd() {
 
 }
 
-// add new Product
-function addNewProd() {
-    interface.append(createProd());
-}
-
-// close modal
-function closeModal() {
-    modalContent.classList.add('scale-out');
-    setTimeout(() => {
-        modal.classList.add('hidden');
-    }, 300);
-}
-
-// btn event
-addProd.addEventListener("click", addNewProd);
-
+// Function delete one product
 function delOne(event) {
     const contentArea = event.target.closest('.content-area');
 
@@ -68,8 +54,51 @@ function delOne(event) {
     }
 }
 
+// function open form modal
+function openModal() {
+    modalContent.classList.add("scale-in");
+    modal.classList.remove("hidden");
+    setTimeout(() => {
+        modalContent.classList.remove("scale-in");
+    }, 300);
+}
+
+// close modal
+function closeModal() {
+    modalContent.classList.add('scale-out');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modalContent.classList.remove('scale-out');
+    }, 300);
+}
+
+// funcitons for confirm msg animations
+function msgFadeIn() {
+    confirmMsg.classList.remove("hidden");
+    confirmMsg.classList.add('fade-in');
+    setTimeout(() => {
+        confirmMsg.classList.add("hidden");
+        confirmMsg.classList.remove('fade-in');
+    }, 7000);
+}
+
+// function add new product
+function addNewProd() {
+    interface.append(createProd());
+    
+}
+
+// btn event
+addProd.addEventListener("click", openModal);
+
 delProdButtons.forEach(button => {
     button.addEventListener('click', delOne);
 });
 
 closeModalBtn.addEventListener('click', closeModal);
+confirmBtn.addEventListener('click', () => {
+    closeModal();
+    msgFadeIn();
+    addNewProd();
+});
+
