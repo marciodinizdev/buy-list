@@ -9,6 +9,8 @@ const confirmMsg = document.querySelector(".confirm-msg");
 const modal = document.querySelector(".modal");
 const modalContent = document.querySelector(".modal-content");
 
+
+
 // create a new product
 function createProd() {
 
@@ -51,6 +53,7 @@ function delOne(event) {
 
     if (contentArea) {
         contentArea.remove();
+        checkEmptyInterface();
     }
 }
 
@@ -88,6 +91,18 @@ function addNewProd() {
     
 }
 
+// Function to check empty interface
+function checkEmptyInterface() {
+    const contentAreas = document.querySelectorAll('.content-area');
+    const noProducts = document.querySelector('.no-products');
+
+    if (contentAreas.length === 0) {
+        noProducts.classList.remove('hidden');
+    } else {
+        noProducts.classList.add('hidden');
+    }
+}
+
 // btn event
 addProd.addEventListener("click", openModal);
 
@@ -102,3 +117,5 @@ confirmBtn.addEventListener('click', () => {
     addNewProd();
 });
 
+// load interface
+document.addEventListener('DOMContentLoaded', checkEmptyInterface);
