@@ -51,7 +51,7 @@ h1 {
     max-width: 400px;
     font-size: 1rem;
     padding: 10px;
-    border: 1px solid;
+    border: 1px solid #4141413a;
 }
 .confirm-msg {
     font-size: 1.6rem;
@@ -93,13 +93,16 @@ h1 {
     gap: 1rem;
 }
 #interface .no-products .tutorial .how-add-prod {
-    margin-left: 34px;
+    margin-left: 30px;
+    color: #523cb4;
+    
 }
 #interface .no-products .tutorial .how-recover-list {
-    margin-left: 35px;
+    margin-left: 38px;
 }
 #interface .no-products .tutorial .how-clear-list {
     margin-left: 1px;
+    color: #ee3b3b;
 }
 .content-area {
     display: flex;
