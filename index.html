@@ -20,7 +20,7 @@
 </head>
 
 <body>
-    <h1>Compras</h1>
+    <h1>Lista de Compras</h1>
     <div id="interface">
         <section class="content-area">
             <section class="prod-area">
@@ -44,35 +44,9 @@
                 add
             </span>
             </button>
-            <div class="tutorial">
-                <div class="how-add-prod">
-                    <span>Adicionar</span>
-                    <svg width="50" height="200" viewBox="0 0 50 200" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="25" y1="0" x2="25" y2="170" stroke="#523cb4" stroke-width="4" />
-                    <polygon points="10,170 25,200 40,170" fill="#523cb4" />
-                    </svg>
-
-                </div>
-                <div class="how-recover-list">
-                    <span>Recuperar</span>
-                    <svg width="50" height="200" viewBox="0 0 50 200" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="25" y1="0" x2="25" y2="170" stroke="black" stroke-width="4" />
-                    <polygon points="10,170 25,200 40,170" fill="black" />
-                    </svg>
-                </div>
-                <div class="how-clear-list">
-                    <span>Limpar</span>
-                    <svg width="50" height="200" viewBox="0 0 50 200" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="25" y1="0" x2="25" y2="170" stroke="#ee3b3b" stroke-width="4" />
-                    <polygon points="10,170 25,200 40,170" fill="#ee3b3b" />
-                    </svg>
-                </div>
-
-            </div>
+            
 
         </div>
-
-        
         
     </div>
     <div class="confirm-msg hidden">
@@ -81,23 +55,32 @@
             task_alt
         </span>
     </div>
-    <section id="btn-area">
-        <button id="add-prod" class="interface-btn">
-            <span class="material-symbols-rounded">
-                add
-            </span>
-        </button>
-        <button id="recover-prod" class="interface-btn">
-            <span class="material-symbols-rounded">
-                backup
-            </span>
-        </button>
-        <button id="clear-prod" class="interface-btn">
-            <span class="material-symbols-rounded">
-                delete_forever
-            </span>
-        </button>
-    </section>
+    <footer >
+        <div class="tutorial">
+            <span id="tutorial-add">Adicionar <br> |</span>
+            <span id="tutorial-recover">Recuperar <br> |</span>
+            <span id="tutorial-clear">Limpar <br> |</span>
+        </div>
+        <div>
+            <div id="btn-area">
+                <button id="add-prod" class="interface-btn">
+                    <span class="material-symbols-rounded">
+                        add
+                    </span>
+                </button>
+                <button id="recover-prod" class="interface-btn">
+                    <span class="material-symbols-rounded">
+                        backup
+                    </span>
+                </button>
+                <button id="clear-prod" class="interface-btn">
+                    <span class="material-symbols-rounded">
+                        delete_forever
+                    </span>
+                </button>
+            </div>
+        </div>
+    </footer>
     
     <div id="modal-add-prod" class="modal hidden">
         <div class="modal-content">
