@@ -41,25 +41,71 @@ h1 {
 }
 
 #interface {
-    margin-top: 10px;
+    margin: 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    flex: 1;
     gap: 10px;
     width: 100%;
     max-width: 400px;
     font-size: 1rem;
     padding: 10px;
+    border: 1px solid;
 }
-#interface .confirm-msg {
-    font-size: 1.4rem;
+.confirm-msg {
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    position: fixed;
+    bottom: 0;
+    margin-bottom: 180px;
+    margin-left: 10px;
+}
+.msg-tick {
+    color: rgb(26, 202, 26);
+}
+#interface .no-products {
+    font-size: 1.3rem;
+    opacity: 0.5;
+    
+    margin-top: 100px;
+}
+#interface .no-products #add-first-prod {
+    margin-top: 50px;
+    width: 150px;
+    height: 150px;
+    background-color: none;
+    color: #414141;
+    margin-bottom: 50px;
+}
+#interface .no-products .tutorial {
+    margin-top: 70px;
+    display: flex;
+    justify-content: space-around;
+    opacity: 0.4;
+}
+#interface .no-products .tutorial div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+#interface .no-products .tutorial .how-add-prod {
+    margin-left: 34px;
+}
+#interface .no-products .tutorial .how-recover-list {
+    margin-left: 35px;
+}
+#interface .no-products .tutorial .how-clear-list {
+    margin-left: 1px;
 }
 .content-area {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    
 }
 .content-area .prod-area {
     display: flex;

@@ -5,11 +5,11 @@ const delProdButtons = document.querySelectorAll('.del-prod');
 const clearProd = document.querySelector('#clear-prod');
 const closeModalBtn = document.querySelector("#close-modal");
 const confirmMsg = document.querySelector(".confirm-msg");
+const addFirstProd = document.querySelector('#add-first-prod');
+const noProd = document.querySelector(".no-products");
 
 const modal = document.querySelector(".modal");
 const modalContent = document.querySelector(".modal-content");
-
-
 
 // create a new product
 function createProd() {
@@ -77,6 +77,7 @@ function closeModal() {
 
 // funcitons for confirm msg animations
 function msgFadeIn() {
+    noProd.classList.add('hidden');
     confirmMsg.classList.remove("hidden");
     confirmMsg.classList.add('fade-in');
     setTimeout(() => {
@@ -87,6 +88,7 @@ function msgFadeIn() {
 
 // function add new product
 function addNewProd() {
+
     interface.append(createProd());
     
 }
@@ -104,6 +106,7 @@ function checkEmptyInterface() {
 }
 
 // btn event
+addFirstProd.addEventListener("click", openModal);
 addProd.addEventListener("click", openModal);
 
 delProdButtons.forEach(button => {
