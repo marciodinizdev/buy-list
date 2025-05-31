@@ -51,7 +51,7 @@ h1 {
     max-width: 400px;
     font-size: 1rem;
     padding: 10px;
-    border: 1px solid #4141413a;
+    /* border: 1px solid #4141413a; */
 }
 .confirm-msg {
     font-size: 1.6rem;
