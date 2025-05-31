@@ -13,6 +13,9 @@
 .fade-out {
     animation: fade-out 2s ease-in-out forwards;
 }
+.fade-simple {
+    animation: fade-simple 10s ease-in-out forwards;
+}
 
 @keyframes scale-in {
     0% {
@@ -65,6 +68,23 @@
 @keyframes fade-out {
     0% {
         opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes fade-simple {
+    0% { 
+        opacity: 0; 
+    }
+    30% { 
+        opacity: 0.4;     
+    }
+
+    80% { 
+        opacity: 0.4;
+
     }
     100% {
         opacity: 0;
