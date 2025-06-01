@@ -20,26 +20,37 @@ function playBubble() {
 
 // create a new product
 function createProd(name, quantity) {
-
-    // create elements
+    // create item content
     const contentArea = document.createElement("section");
     contentArea.className = "content-area";
 
     const prodArea = document.createElement("section");
     prodArea.className = "prod-area";
 
+    // checkbox
     const checkDiv = document.createElement("div");
     checkDiv.className = "check";
-    checkDiv.textContent = "check";
 
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "prod-checkbox";
+    checkbox.addEventListener('change', () => {
+        nameDiv.classList.toggle('checked', checkbox.checked);
+    });
+
+    checkDiv.appendChild(checkbox);
+
+    // product name
     const nameDiv = document.createElement("div");
     nameDiv.className = "prod-name";
     nameDiv.textContent = name;
 
+    // quantity
     const qtDiv = document.createElement("div");
     qtDiv.className = "prod-qt";
-    qtDiv.textContent = quantity;
+    qtDiv.textContent = `- ${quantity}`;
 
+    // del btn
     const delBtn = document.createElement("button");
     delBtn.className = "del-prod";
 
@@ -47,15 +58,22 @@ function createProd(name, quantity) {
     delIcon.className = "material-symbols-rounded";
     delIcon.textContent = "delete";
 
-    // structuring
-    delBtn.append(delIcon);
-    prodArea.append(checkDiv, nameDiv, qtDiv);
-    contentArea.append(prodArea, delBtn);
-
+    delBtn.appendChild(delIcon);
     delBtn.addEventListener('click', delOne);
 
-    return contentArea;
+    // structure
+    const leftSide = document.createElement("div");
+    leftSide.className = "left-side";
+    leftSide.appendChild(checkDiv);
+    leftSide.appendChild(nameDiv);
 
+    prodArea.appendChild(leftSide);
+    prodArea.appendChild(qtDiv);
+
+    contentArea.appendChild(prodArea);
+    contentArea.appendChild(delBtn);
+
+    return contentArea;
 }
 
 // Function delete one product
@@ -92,7 +110,10 @@ function closeModal() {
 
 // funcitons for confirm/error msg animations
 function confirmFadeIn() {
+    // add product removes noProd btn
     noProd.classList.add('hidden');
+
+    errorMsg.classList.add('hidden');
     confirmMsg.classList.remove("hidden");
     confirmMsg.classList.add('fade-in');
     setTimeout(() => {
@@ -102,7 +123,7 @@ function confirmFadeIn() {
 }
 // funcitons for confirm/error msg animations
 function errorFadeIn() {
-    noProd.classList.add('hidden');
+    confirmMsg.classList.add('hidden');
     errorMsg.classList.remove("hidden");
     errorMsg.classList.add('error-alert');
     setTimeout(() => {
@@ -123,14 +144,19 @@ function addNewProd() {
     closeModal();
     
     if (name && quantity && parseInt(quantity) > 0) {
-        const newProduct = createProd(name, quantity);
-        interface.appendChild(newProduct);
-        confirmFadeIn();
-        checkEmptyInterface();
-        nameInput.value = '';
-        qtdInput.value = '';
         setTimeout(() => {
-            bubble.play();
+            
+            const newProduct = createProd(name, quantity);
+            interface.appendChild(newProduct);
+            confirmFadeIn();
+            checkEmptyInterface();
+            nameInput.value = '';
+            qtdInput.value = '';
+            newProduct.classList.add('scale-in');
+            setTimeout(() => {
+                bubble.play();
+                newProduct.classList.remove('scale-in');
+            }, 300);
         }, 300);
     } else {
         setTimeout(() => {
