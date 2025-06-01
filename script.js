@@ -11,6 +11,12 @@ const noProd = document.querySelector(".no-products");
 const modal = document.querySelector(".modal");
 const modalContent = document.querySelector(".modal-content");
 
+const bubble = new Audio('./assets/bubble2.mp3');
+function playBubble() {
+    bubble.currentTime = 0;
+    bubble.play();
+}
+
 // create a new product
 function createProd() {
 
@@ -50,10 +56,14 @@ function createProd() {
 // Function delete one product
 function delOne(event) {
     const contentArea = event.target.closest('.content-area');
-
+    
     if (contentArea) {
-        contentArea.remove();
-        checkEmptyInterface();
+        contentArea.classList.add('scale-out');
+        setTimeout(() => {
+            contentArea.remove();
+            checkEmptyInterface();
+            playBubble();
+        }, 300);
     }
 }
 
@@ -88,9 +98,7 @@ function msgFadeIn() {
 
 // function add new product
 function addNewProd() {
-
     interface.append(createProd());
-    
 }
 
 // Function to check empty interface
