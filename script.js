@@ -82,10 +82,11 @@ function delOne(event) {
     
     if (contentArea) {
         contentArea.classList.add('scale-out');
+        playBubble();
         setTimeout(() => {
             contentArea.remove();
             checkEmptyInterface();
-            playBubble();
+            
         }, 300);
     }
 }
@@ -132,7 +133,6 @@ function errorFadeIn() {
     }, 7000);
 }
 
-
 // function add new product
 function addNewProd() {
     const nameInput = document.querySelector('#prod-field');
@@ -145,16 +145,16 @@ function addNewProd() {
     
     if (name && quantity && parseInt(quantity) > 0) {
         setTimeout(() => {
-            
+            playBubble();
             const newProduct = createProd(name, quantity);
             interface.appendChild(newProduct);
             confirmFadeIn();
             checkEmptyInterface();
             nameInput.value = '';
-            qtdInput.value = '';
+            qtdInput.value = '1';
             newProduct.classList.add('scale-in');
             setTimeout(() => {
-                bubble.play();
+                
                 newProduct.classList.remove('scale-in');
             }, 300);
         }, 300);

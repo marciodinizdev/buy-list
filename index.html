@@ -42,8 +42,8 @@
     </div>
     <div class="confirm-msg hidden">
         <span>Produto adicionado!</span>
-            <span class="material-symbols-rounded confirm-tick">
-                task_alt
+        <span class="material-symbols-rounded confirm-tick">
+            task_alt
         </span>
     </div>
     <footer>
@@ -90,7 +90,9 @@
                 </div>
                 <div>
                     <span>Quantos?</span>
-                    <input type="number" name="qtd-field" id="qtd-field" placeholder="0" min="0" maxlength="2">
+                    <input id="qtd-field" type="number" min="1" max="99" value="1"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 2)" />
+
                 </div>
                 <button id="ok-modal" class="confirm-btn">Adicionar</button>
             </div>
