@@ -5,6 +5,7 @@ const delProdButtons = document.querySelectorAll('.del-prod');
 const clearProd = document.querySelector('#clear-prod');
 const closeModalBtn = document.querySelector("#close-modal");
 const confirmMsg = document.querySelector(".confirm-msg");
+const errorMsg = document.querySelector(".error-msg");
 const addFirstProd = document.querySelector('#add-first-prod');
 const noProd = document.querySelector(".no-products");
 
@@ -18,7 +19,7 @@ function playBubble() {
 }
 
 // create a new product
-function createProd() {
+function createProd(name, quantity) {
 
     // create elements
     const contentArea = document.createElement("section");
@@ -50,6 +51,10 @@ function createProd() {
     delBtn.append(delIcon);
     prodArea.append(checkDiv, nameDiv, qtDiv);
     contentArea.append(prodArea, delBtn);
+
+    delBtn.addEventListener('click', delOne);
+
+    return contentArea;
 
 }
 
@@ -85,8 +90,8 @@ function closeModal() {
     }, 300);
 }
 
-// funcitons for confirm msg animations
-function msgFadeIn() {
+// funcitons for confirm/error msg animations
+function confirmFadeIn() {
     noProd.classList.add('hidden');
     confirmMsg.classList.remove("hidden");
     confirmMsg.classList.add('fade-in');
@@ -95,10 +100,43 @@ function msgFadeIn() {
         confirmMsg.classList.remove('fade-in');
     }, 7000);
 }
+// funcitons for confirm/error msg animations
+function errorFadeIn() {
+    noProd.classList.add('hidden');
+    errorMsg.classList.remove("hidden");
+    errorMsg.classList.add('error-alert');
+    setTimeout(() => {
+        errorMsg.classList.add("hidden");
+        errorMsg.classList.remove('error-alert');
+    }, 7000);
+}
+
 
 // function add new product
 function addNewProd() {
-    interface.append(createProd());
+    const nameInput = document.querySelector('#prod-field');
+    const qtdInput = document.querySelector('#qtd-field');
+
+    const name = nameInput.value.trim();
+    const quantity = qtdInput.value.trim();
+
+    closeModal();
+    
+    if (name && quantity && parseInt(quantity) > 0) {
+        const newProduct = createProd(name, quantity);
+        interface.appendChild(newProduct);
+        confirmFadeIn();
+        checkEmptyInterface();
+        nameInput.value = '';
+        qtdInput.value = '';
+        setTimeout(() => {
+            bubble.play();
+        }, 300);
+    } else {
+        setTimeout(() => {
+            errorFadeIn();
+        }, 300);
+    }
 }
 
 // Function to check empty interface
@@ -122,11 +160,9 @@ delProdButtons.forEach(button => {
 });
 
 closeModalBtn.addEventListener('click', closeModal);
-confirmBtn.addEventListener('click', () => {
-    closeModal();
-    msgFadeIn();
-    addNewProd();
-});
+
+confirmBtn.addEventListener('click', addNewProd);
+
 
 // load interface
 document.addEventListener('DOMContentLoaded', checkEmptyInterface);

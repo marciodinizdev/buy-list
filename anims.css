@@ -16,6 +16,9 @@
 .fade-simple {
     animation: fade-simple 10s ease-in-out forwards;
 }
+.error-alert {
+    animation: error-alert 7s ease-in-out forwards;
+}
 
 @keyframes scale-in {
     0% {
@@ -86,6 +89,39 @@
         opacity: 0.4;
 
     }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes error-alert {
+    0% {
+        transform: translateX(-10px);
+    }
+    1% {
+        transform: translateX(10px);
+    }
+    2% {
+        transform: translateX(-10px);
+    }
+    3% {
+        transform: translateX(10px);
+    }
+
+    4% {
+        transform: translateX(-10px);
+    }
+    5% {
+        transform: translateX(10px);
+    }
+    6% {
+        transform: translateX(0px);
+    }
+
+    80% {
+        opacity: 1;
+    }
+
     100% {
         opacity: 0;
     }

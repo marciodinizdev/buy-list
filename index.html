@@ -36,25 +36,31 @@
                     delete
                 </span>
             </button>
-            
         </section>
-        <div class="no-products hidden">
-            <div class="no-products-msg">Adicione o primeiro produto!</div>
-            <button id="add-first-prod" class="interface-btn">
-                <span class="material-symbols-rounded">
-                    add
-                </span>
-            </button>
-        </div>
-        
+
     </div>
-    <div class="confirm-msg hidden">
-         <span>Produto adicionado!</span>
-         <span class="material-symbols-rounded msg-tick">
-            task_alt
+    <div class="no-products hidden">
+        <div class="no-products-msg">Adicione o primeiro produto!</div>
+        <button id="add-first-prod" class="interface-btn">
+            <span class="material-symbols-rounded">
+                add
+            </span>
+        </button>
+    </div>
+
+    <div class="error-msg hidden">
+        <span>Não adicionou nada!</span>
+        <span class="material-symbols-rounded error-tick">
+            error
         </span>
     </div>
-    <footer >
+    <div class="confirm-msg hidden">
+        <span>Produto adicionado!</span>
+            <span class="material-symbols-rounded confirm-tick">
+                task_alt
+        </span>
+    </div>
+    <footer>
         <div class="tutorial fade-simple">
             <span id="tutorial-add">Adicionar <br> |</span>
             <span id="tutorial-recover">Recuperar <br> |</span>
@@ -80,7 +86,7 @@
             </div>
         </div>
     </footer>
-    
+
     <div id="modal-add-prod" class="modal hidden">
         <div class="modal-content">
             <button id="close-modal" class="close-modal-btn">
@@ -88,12 +94,13 @@
                     close
                 </span>
             </button>
-            
+
             <div class="fields">
                 <h3>Adicionar Produtos</h3>
                 <div>
                     <span>Produto:</span>
-                    <input type="text" name="prod-field" id="prod-field" placeholder="Digite o nome do produto" maxlength="20">
+                    <input type="text" name="prod-field" id="prod-field" placeholder="Digite o nome do produto"
+                        maxlength="20">
                 </div>
                 <div>
                     <span>Quantos?</span>
@@ -101,7 +108,7 @@
                 </div>
                 <button id="ok-modal" class="confirm-btn">Adicionar</button>
             </div>
-            
+
         </div>
     </div>
     <script src="script.js"></script>

@@ -44,14 +44,11 @@ h1 {
     margin: 10px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    flex: 1;
     gap: 10px;
     width: 100%;
     max-width: 400px;
     font-size: 1rem;
     padding: 10px;
-    /* border: 1px solid #4141413a; */
 }
 .confirm-msg {
     font-size: 1.6rem;
@@ -63,16 +60,31 @@ h1 {
     margin-bottom: 180px;
     margin-left: 10px;
 }
-.msg-tick {
+.confirm-tick {
     color: rgb(26, 202, 26);
 }
-#interface .no-products {
+
+.error-msg {
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    position: fixed;
+    bottom: 0;
+    margin-bottom: 180px;
+    margin-left: 10px;
+}
+.error-tick {
+    color: #ee3b3b;
+}
+
+.no-products {
     font-size: 1.3rem;
     opacity: 0.5;
     
     margin-top: 100px;
 }
-#interface .no-products #add-first-prod {
+.no-products #add-first-prod {
     margin-top: 50px;
     width: 150px;
     height: 150px;
@@ -80,30 +92,19 @@ h1 {
     color: #414141;
     margin-bottom: 50px;
 }
-#interface .no-products .tutorial {
+.no-products .tutorial {
     margin-top: 70px;
     display: flex;
     justify-content: space-around;
     opacity: 0.4;
 }
-#interface .no-products .tutorial div {
+.no-products .tutorial div {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1rem;
 }
-#interface .no-products .tutorial .how-add-prod {
-    margin-left: 30px;
-    color: #523cb4;
-    
-}
-#interface .no-products .tutorial .how-recover-list {
-    margin-left: 38px;
-}
-#interface .no-products .tutorial .how-clear-list {
-    margin-left: 1px;
-    color: #ee3b3b;
-}
+
 .content-area {
     display: flex;
     flex-direction: row;
@@ -164,7 +165,7 @@ footer .tutorial #tutorial-add{
 }
 footer .tutorial #tutorial-recover{
     color: #414141;
-    margin-left: 30px;
+    margin-left: 38px;
 }
 footer .tutorial #tutorial-clear{
     color: #ee3b3b;
