@@ -13,9 +13,14 @@ const modal = document.querySelector(".modal");
 const modalContent = document.querySelector(".modal-content");
 
 const bubble = new Audio('./assets/bubble2.mp3');
+const clear = new Audio('./assets/clear.mp3');
 function playBubble() {
     bubble.currentTime = 0;
     bubble.play();
+}
+function playClear() {
+    clear.currentTime = 0;
+    clear.play();
 }
 
 // create a new product
@@ -57,7 +62,6 @@ function createProd(name, quantity) {
 
     checkDiv.appendChild(checkbox);
     checkDiv.appendChild(checkCustom);
-
 
     // product name
     const nameDiv = document.createElement("div");
@@ -196,6 +200,12 @@ function checkEmptyInterface() {
     }
 }
 
+// function clear interface
+function clearInteface() {
+    interface.innerHTML = "";
+    checkEmptyInterface();
+}
+
 // btn event
 addFirstProd.addEventListener("click", openModal);
 addProd.addEventListener("click", openModal);
@@ -208,6 +218,10 @@ closeModalBtn.addEventListener('click', closeModal);
 
 confirmBtn.addEventListener('click', addNewProd);
 
+clearProd.addEventListener('click', () => {
+    clearInteface();
+    playClear();
+});
 
 // load interface
 document.addEventListener('DOMContentLoaded', checkEmptyInterface);
