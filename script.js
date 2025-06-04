@@ -28,17 +28,23 @@ function createProd(name, quantity) {
     prodArea.className = "prod-area";
 
     // checkbox
-    const checkDiv = document.createElement("div");
+    const checkDiv = document.createElement("label"); // Use label para melhorar acessibilidade
     checkDiv.className = "check";
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.className = "prod-checkbox";
+
+    const checkCustom = document.createElement("span");
+    checkCustom.className = "check-custom";
+
     checkbox.addEventListener('change', () => {
         nameDiv.classList.toggle('checked', checkbox.checked);
     });
 
     checkDiv.appendChild(checkbox);
+    checkDiv.appendChild(checkCustom);
+
 
     // product name
     const nameDiv = document.createElement("div");
@@ -48,7 +54,7 @@ function createProd(name, quantity) {
     // quantity
     const qtDiv = document.createElement("div");
     qtDiv.className = "prod-qt";
-    qtDiv.textContent = `- ${quantity}`;
+    qtDiv.textContent = `${quantity}`;
 
     // del btn
     const delBtn = document.createElement("button");
