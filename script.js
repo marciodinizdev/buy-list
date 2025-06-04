@@ -38,9 +38,22 @@ function createProd(name, quantity) {
     const checkCustom = document.createElement("span");
     checkCustom.className = "check-custom";
 
-    checkbox.addEventListener('change', () => {
-        nameDiv.classList.toggle('checked', checkbox.checked);
+    // function to toggle ckeckbox state
+    const toggleCheckState = () => {
+        const isChecked = checkbox.checked;
+
+        prodArea.classList.toggle('checked', isChecked);
+        nameDiv.classList.toggle('checked', isChecked);
+        qtDiv.classList.toggle('checked', isChecked);
+    };
+    
+    prodArea.addEventListener('click', () => {
+        // change current check state
+        checkbox.checked = !checkbox.checked;
+        toggleCheckState();
     });
+
+    checkbox.addEventListener('change', toggleCheckState);
 
     checkDiv.appendChild(checkbox);
     checkDiv.appendChild(checkCustom);
@@ -85,14 +98,14 @@ function createProd(name, quantity) {
 // Function delete one product
 function delOne(event) {
     const contentArea = event.target.closest('.content-area');
-    
+
     if (contentArea) {
         contentArea.classList.add('scale-out');
         playBubble();
         setTimeout(() => {
             contentArea.remove();
             checkEmptyInterface();
-            
+
         }, 300);
     }
 }
@@ -148,7 +161,7 @@ function addNewProd() {
     const quantity = qtdInput.value.trim();
 
     closeModal();
-    
+
     if (name && quantity && parseInt(quantity) > 0) {
         setTimeout(() => {
             playBubble();
@@ -160,7 +173,7 @@ function addNewProd() {
             qtdInput.value = '1';
             newProduct.classList.add('scale-in');
             setTimeout(() => {
-                
+
                 newProduct.classList.remove('scale-in');
             }, 300);
         }, 300);

@@ -10,7 +10,7 @@
 
 :root {
     --primary-color: #4d33be;
-    --secondary-color: #fff;
+    --secondary-color: #F8FAFC;
     --tertiary-color: #e8e8e8;
     --dark-color: #414141;
     --dark-light-color: #999999;
@@ -22,7 +22,7 @@ body {
     align-items: center;
     text-align: center;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    background-color: var(--secondary-color);
+    background-color: var(--tertiary-color);
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -44,7 +44,7 @@ h1 {
     margin: 10px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 3px;
     width: 100%;
     max-width: 400px;
     font-size: 1rem;
@@ -122,13 +122,20 @@ h1 {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    border: 1px solid #41414134;
     box-shadow: 1px 1px 10px 1px #41414110;
-    border-radius: 20px;
+    border-radius: 10px;
     padding: 9px 15px;
     background-color: var(--secondary-color);
     color: var(--dark-color);
     width: 100%;
+    box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    transition: 200ms;
+    cursor: pointer;
+}
+.prod-area.checked {
+    background-color: #ececec;
 }
 
 .content-area .prod-area .left-side {
@@ -199,9 +206,12 @@ h1 {
     opacity: 0.3;
 }
 
-
 .prod-area .prod-qt {
     color: var(--dark-light-color);
+}
+.prod-area .prod-qt.checked {
+    color: var(--primary-color);
+    opacity: 0.5;
 }
 
 .content-area .del-prod {
