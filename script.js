@@ -206,6 +206,37 @@ function clearInteface() {
     checkEmptyInterface();
 }
 
+// Get welcome modal elements and new buttons
+const welcomeModal = document.querySelector("#welcome-modal");
+const guestBtn = document.querySelector("#guest-btn");
+const loginWelcomeBtn = document.querySelector("#login-welcome-btn");
+const signupWelcomeBtn = document.querySelector("#signup-welcome-btn");
+
+// Function to open/close the welcome modal
+function toggleWelcomeModal(show) {
+    if (show) {
+        welcomeModal.classList.remove("hidden");
+    } else {
+        welcomeModal.classList.add("hidden");
+    }
+}
+
+// Add event listeners for the new buttons in the welcome modal
+guestBtn.addEventListener('click', () => {
+    toggleWelcomeModal(false); // Hide the welcome modal
+    // No other logic needed for guest mode yet
+});
+
+loginWelcomeBtn.addEventListener('click', () => {
+    toggleWelcomeModal(false);
+    // TODO: Adicionar lógica para abrir o modal de login
+});
+
+signupWelcomeBtn.addEventListener('click', () => {
+    toggleWelcomeModal(false);
+    // TODO: Adicionar lógica para abrir o modal de cadastro
+});
+
 // btn event
 addFirstProd.addEventListener("click", openModal);
 addProd.addEventListener("click", openModal);
@@ -224,4 +255,8 @@ clearProd.addEventListener('click', () => {
 });
 
 // load interface
-document.addEventListener('DOMContentLoaded', checkEmptyInterface);
+document.addEventListener('DOMContentLoaded', () => {
+    checkEmptyInterface();
+    // Show the welcome modal on page load
+    toggleWelcomeModal(true);
+});
