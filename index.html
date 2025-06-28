@@ -14,14 +14,24 @@
     <link rel="shortcut icon" href="./assets/favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="anims.css">
     <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
     <title>Lista de Compras</title>
 </head>
 
 <body>
     <h1>Lista de Compras</h1>
+
+    <div class="user-info hidden">
+        <span id="user-greeting" class="display-none"></span>
+        <button id="back-to-login-btn" class="user-btn login-btn display-none">
+            <span>Login</span>
+        </button>
+        <button id="logout-btn" class="user-btn logout-btn display-none">
+            <span>Sair</span>
+        </button>
+    </div>
+
     <div id="interface">
-        </div>
+    </div>
     <div class="no-products hidden">
         <div class="no-products-msg">Adicione o primeiro produto!</div>
         <button id="add-first-prod" class="interface-btn">
@@ -107,7 +117,86 @@
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+            <button id="close-login-modal" class="close-modal-btn">
+                <span class="material-symbols-rounded">close</span>
+            </button>
+            <div class="fields">
+                <h3>Login</h3>
+                <form id="login-form">
+                    <div>
+                        <span>Email:</span>
+                        <input type="email" name="email" id="login-email" placeholder="Seu email" required>
+                    </div>
+                    <div>
+                        <span>Senha:</span>
+                        <input type="password" name="password" id="login-password" placeholder="Sua senha" required>
+                    </div>
+                    <button type="submit" class="confirm-btn">Entrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="signup-modal" class="modal hidden">
+        <div class="modal-content">
+            <button id="close-signup-modal" class="close-modal-btn">
+                <span class="material-symbols-rounded">close</span>
+            </button>
+            <div class="fields">
+                <h3>Cadastrar</h3>
+                <form id="signup-form">
+                    <div>
+                        <span>Nome:</span>
+                        <input type="text" name="name" id="signup-name" placeholder="Digite seu nome" required>
+                    </div>
+                    <div>
+                        <span>Email:</span>
+                        <input type="email" name="email" id="signup-email" placeholder="Seu email" required>
+                    </div>
+                    <div>
+                        <span>Senha:</span>
+                        <input type="password" name="password" id="signup-password" placeholder="Mínimo 6 caracteres" required>
+                    </div>
+                    <button type="submit" class="confirm-btn">Cadastrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBA8iLh0Ze-W8l6NWEmaQdXWkUMnNQKbcw",
+            authDomain: "listacomprasfacil-e4144.firebaseapp.com",
+            projectId: "listacomprasfacil-e4144",
+            storageBucket: "listacomprasfacil-e4144.firebasestorage.app",
+            messagingSenderId: "680983889086",
+            appId: "1:680983889086:web:80308ab972f09d01b04aef"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        window.auth = getAuth(app);
+        window.db = getFirestore(app);
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signOut = signOut;
+        window.updateProfile = updateProfile;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.doc = doc;
+        window.deleteDoc = deleteDoc;
+        window.updateDoc = updateDoc;
+    </script>
+    
+    <script src="script.js" type="module"></script>
 </body>
 
 </html>
