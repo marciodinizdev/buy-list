@@ -131,18 +131,14 @@ if (signupForm) {
             const userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
             let user = userCredential.user;
             
-            // Updates the user profile with the collected name
             await window.updateProfile(user, {
                 displayName: name
             });
-
-            // Forces the user data to reload to ensure displayName is available in the session.
             await user.reload(); 
-            user = window.auth.currentUser; // Updates the 'user' variable with the reloaded data
-
+            user = window.auth.currentUser;
+            
             closeAnyModal(signupModal);
             
-            // Adds a log to confirm that the name was set
             console.log("Profile updated successfully. DisplayName:", user.displayName);
         } catch (error) {
             console.error("signup error:", error.message);
@@ -156,8 +152,12 @@ if (logoutButton) {
     logoutButton.addEventListener("click", () => {
         window.signOut(window.auth)
             .then(() => {
-                console.log("user successfully logged out.");
+                // **CORREÇÃO:** Direciona para o modal de boas-vindas e esconde a barra de usuário
                 localStorage.removeItem('welcomeModalSeen');
+                welcomeModal.classList.remove("hidden");
+                document.querySelector(".user-info").classList.add("hidden");
+                clearInterface();
+                console.log("user successfully logged out.");
             })
             .catch(error => console.error("error logging out:", error.message));
     });
@@ -168,10 +168,9 @@ window.onAuthStateChanged(window.auth, user => {
     if (user) {
         // user is logged in
         currentUser = user;
-        // Displays the user's name if available, otherwise uses the email.
         const userName = user.displayName || user.email;
         userGreeting.textContent = `Olá, ${userName}!`;
-        document.querySelector(".user-info").classList.remove("hidden");
+        // **CORREÇÃO:** Removido o controle de visibilidade daqui, pois é feito pelos botões do modal
         userGreeting.classList.remove("display-none");
         logoutButton.classList.remove("display-none");
         if (backToLoginButton) backToLoginButton.classList.add("display-none");
@@ -181,9 +180,9 @@ window.onAuthStateChanged(window.auth, user => {
     } else {
         // user is logged out (guest mode)
         currentUser = null;
-        document.querySelector(".user-info").classList.remove("hidden");
+        // **CORREÇÃO:** Removido o controle de visibilidade daqui
         userGreeting.classList.remove("display-none");
-        userGreeting.textContent = `Modo Convidado`;
+        userGreeting.textContent = `Modo CONVIDADO`;
         if (backToLoginButton) backToLoginButton.classList.remove("display-none");
         logoutButton.classList.add("display-none");
         recoverProductsButton.classList.add("hidden");
@@ -223,10 +222,10 @@ function closeAnyModal(modalElement) {
 if (loginWelcomeButton) loginWelcomeButton.addEventListener('click', openLoginModal);
 if (signupWelcomeButton) signupWelcomeButton.addEventListener('click', openSignupModal);
 if (guestButton) guestButton.addEventListener('click', () => {
-    welcomeModal.classList.add('hidden');
+    welcomeModal.classList.add("hidden");
     localStorage.setItem('welcomeModalSeen', 'true');
     clearInterface(false);
-    document.querySelector(".user-info").classList.remove("hidden"); 
+    document.querySelector(".user-info").classList.remove("hidden");
 });
 if (closeLoginModalButton) closeLoginModalButton.addEventListener('click', () => closeAnyModal(loginModal));
 if (closeSignupModalButton) closeSignupModalButton.addEventListener('click', () => closeAnyModal(signupModal));
@@ -235,7 +234,7 @@ if (backToLoginButton) {
     backToLoginButton.addEventListener('click', () => {
         localStorage.removeItem('welcomeModalSeen');
         welcomeModal.classList.remove("hidden");
-        document.querySelector(".user-info").classList.add("hidden"); 
+        document.querySelector(".user-info").classList.add("hidden");
     });
 }
 
@@ -305,7 +304,7 @@ function createProductElement(name, quantity) {
 
     const deleteIcon = document.createElement("span");
     deleteIcon.className = "material-symbols-rounded";
-    delIcon.textContent = "delete";
+    deleteIcon.textContent = "delete";
 
     deleteButton.appendChild(deleteIcon);
     deleteButton.addEventListener('click', deleteOneProduct);
