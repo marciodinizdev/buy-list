@@ -26,6 +26,7 @@ function playClearSound() {
     clearSound.play();
 }
 
+// references for authentication elements
 const welcomeModal = document.querySelector("#welcome-modal");
 const loginModal = document.querySelector("#login-modal");
 const signupModal = document.querySelector("#signup-modal");
@@ -43,8 +44,7 @@ const backToLoginButton = document.querySelector("#back-to-login-btn");
 
 let currentUser = null;
 
-function deleteProductFromLocalStorage(productName) {}
-
+// **NOVA FUNCIONALIDADE:** Funções de persistência de dados com Firestore
 async function saveProductToFirestore(product) {
     try {
         const docRef = await window.addDoc(window.collection(window.db, `users/${currentUser.uid}/shoppingLists`), product);
@@ -98,6 +98,7 @@ async function updateProductStateInFirestore(docId, isChecked) {
     }
 }
 
+// **NOVA FUNCIONALIDADE:** Lógica de autenticação
 if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -123,13 +124,16 @@ if (signupForm) {
         try {
             const userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
             let user = userCredential.user;
+            
             await window.updateProfile(user, {
                 displayName: name
             });
             await user.reload(); 
             user = window.auth.currentUser;
+            
             closeAnyModal(signupModal);
             localStorage.setItem('welcomeModalSeen', 'true');
+            
             console.log("Profile updated successfully. DisplayName:", user.displayName);
         } catch (error) {
             console.error("signup error:", error.message);
@@ -179,6 +183,7 @@ window.onAuthStateChanged(window.auth, user => {
     }
 });
 
+// **NOVA FUNCIONALIDADE:** Funções de modal e animação
 function openLoginModal() {
     welcomeModal.classList.add("hidden");
     loginModal.classList.remove("hidden");
@@ -206,6 +211,7 @@ function closeAnyModal(modalElement) {
     }, 300);
 }
 
+// **NOVA FUNCIONALIDADE:** Event listeners para os botões do modal de boas-vindas
 if (loginWelcomeButton) loginWelcomeButton.addEventListener('click', openLoginModal);
 if (signupWelcomeButton) signupWelcomeButton.addEventListener('click', openSignupModal);
 if (guestButton) guestButton.addEventListener('click', () => {
@@ -219,6 +225,8 @@ if (guestButton) guestButton.addEventListener('click', () => {
         document.querySelector(".user-info").classList.remove("hidden");
     }, 300);
 });
+
+// **CORREÇÃO:** Botões de fechar de login/cadastro agora voltam para o modal de boas-vindas após a animação de saída
 if (closeLoginModalButton) {
     closeLoginModalButton.addEventListener('click', () => {
         closeAnyModal(loginModal);
@@ -246,6 +254,7 @@ if (backToLoginButton) {
     });
 }
 
+// **CÓDIGO ORIGINAL, APENAS REORGANIZADO E ADICIONADO LÓGICA DE PERSISTÊNCIA**
 function createProductElement(name, quantity) {
     const contentArea = document.createElement("section");
     contentArea.className = "content-area";
@@ -445,14 +454,10 @@ clearProductsButton.addEventListener('click', () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     checkIfInterfaceIsEmpty();
-
+    
     const welcomeModalSeen = localStorage.getItem('welcomeModalSeen');
     if (!welcomeModalSeen) {
         welcomeModal.classList.remove("hidden");
-        const content = welcomeModal.querySelector(".modal-content");
-        void content.offsetWidth;
-        content.classList.add("scale-in");
-        setTimeout(() => content.classList.remove("scale-in"), 300);
         document.querySelector(".user-info").classList.add("hidden");
     } else {
         welcomeModal.classList.add("hidden");

@@ -163,6 +163,19 @@
             </div>
         </div>
     </div>
+    <div id="confirm-action-modal" class="modal hidden">
+        <div class="modal-content">
+            <button id="close-confirm-modal" class="close-modal-btn">
+                <span class="material-symbols-rounded">close</span>
+            </button>
+            <div class="fields">
+                <h3 id="confirm-modal-title"></h3>
+                <span id="confirm-modal-message"></span>
+                <button id="confirm-action-btn" class="confirm-btn">Confirmar</button>
+                <button id="cancel-action-btn" class="confirm-btn">Cancelar</button>
+            </div>
+        </div>
+    </div>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
