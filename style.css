@@ -123,19 +123,7 @@ h1 {
     box-shadow: 0px 0px 10px -4px rgba(0, 0, 0, 0.959);
 }
 
-.no-products .tutorial {
-    margin-top: 70px;
-    display: flex;
-    justify-content: space-around;
-    opacity: 0.4;
-}
 
-.no-products .tutorial div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-}
 
 .content-area {
     display: flex;
@@ -253,29 +241,6 @@ footer {
     position: fixed;
     bottom: 0;
     margin-bottom: 40px;
-}
-
-footer .tutorial {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    opacity: 0.4;
-}
-
-footer .tutorial #tutorial-add {
-    color: #523cb4;
-    margin-left: 35px;
-}
-
-footer .tutorial #tutorial-recover {
-    color: #414141;
-    margin-left: 38px;
-}
-
-footer .tutorial #tutorial-clear {
-    color: #ee3b3b;
 }
 
 footer #btn-area {
