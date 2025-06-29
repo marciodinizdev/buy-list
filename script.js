@@ -113,6 +113,7 @@ if (loginForm) {
         try {
             await window.signInWithEmailAndPassword(window.auth, email, password);
             closeAnyModal(loginModal);
+            localStorage.setItem('welcomeModalSeen', 'true');
         } catch (error) {
             console.error("login error:", error.message);
             alert("login error: " + error.message);
@@ -138,6 +139,7 @@ if (signupForm) {
             user = window.auth.currentUser;
             
             closeAnyModal(signupModal);
+            localStorage.setItem('welcomeModalSeen', 'true');
             
             console.log("Profile updated successfully. DisplayName:", user.displayName);
         } catch (error) {
@@ -152,7 +154,6 @@ if (logoutButton) {
     logoutButton.addEventListener("click", () => {
         window.signOut(window.auth)
             .then(() => {
-                // **CORREÇÃO:** Direciona para o modal de boas-vindas e esconde a barra de usuário
                 localStorage.removeItem('welcomeModalSeen');
                 welcomeModal.classList.remove("hidden");
                 document.querySelector(".user-info").classList.add("hidden");
@@ -166,11 +167,10 @@ if (logoutButton) {
 // firestore auth state observer
 window.onAuthStateChanged(window.auth, user => {
     if (user) {
-        // user is logged in
         currentUser = user;
         const userName = user.displayName || user.email;
         userGreeting.textContent = `Olá, ${userName}!`;
-        // **CORREÇÃO:** Removido o controle de visibilidade daqui, pois é feito pelos botões do modal
+        document.querySelector(".user-info").classList.remove("hidden");
         userGreeting.classList.remove("display-none");
         logoutButton.classList.remove("display-none");
         if (backToLoginButton) backToLoginButton.classList.add("display-none");
@@ -178,11 +178,10 @@ window.onAuthStateChanged(window.auth, user => {
         
         loadShoppingListFromFirestore();
     } else {
-        // user is logged out (guest mode)
         currentUser = null;
-        // **CORREÇÃO:** Removido o controle de visibilidade daqui
+        document.querySelector(".user-info").classList.remove("hidden");
         userGreeting.classList.remove("display-none");
-        userGreeting.textContent = `Modo CONVIDADO`;
+        userGreeting.textContent = `Modo VISITANTE`;
         if (backToLoginButton) backToLoginButton.classList.remove("display-none");
         logoutButton.classList.add("display-none");
         recoverProductsButton.classList.add("hidden");
@@ -197,8 +196,6 @@ function openLoginModal() {
     loginModal.classList.remove("hidden");
     loginModal.querySelector(".modal-content").classList.add("scale-in");
     setTimeout(() => loginModal.querySelector(".modal-content").classList.remove("scale-in"), 300);
-    localStorage.setItem('welcomeModalSeen', 'true');
-    document.querySelector(".user-info").classList.remove("hidden"); 
 }
 
 function openSignupModal() {
@@ -206,10 +203,9 @@ function openSignupModal() {
     signupModal.classList.remove("hidden");
     signupModal.querySelector(".modal-content").classList.add("scale-in");
     setTimeout(() => signupModal.querySelector(".modal-content").classList.remove("scale-in"), 300);
-    localStorage.setItem('welcomeModalSeen', 'true');
-    document.querySelector(".user-info").classList.remove("hidden"); 
 }
 
+// **CORREÇÃO:** Esta função agora apenas fecha o modal que é passado como argumento.
 function closeAnyModal(modalElement) {
     modalElement.querySelector('.modal-content').classList.add('scale-out');
     setTimeout(() => {
@@ -227,14 +223,27 @@ if (guestButton) guestButton.addEventListener('click', () => {
     clearInterface(false);
     document.querySelector(".user-info").classList.remove("hidden");
 });
-if (closeLoginModalButton) closeLoginModalButton.addEventListener('click', () => closeAnyModal(loginModal));
-if (closeSignupModalButton) closeSignupModalButton.addEventListener('click', () => closeAnyModal(signupModal));
+// **CORREÇÃO:** Botões de fechar de login/cadastro agora voltam para o modal de boas-vindas APÓS o fade-out
+if (closeLoginModalButton) {
+    closeLoginModalButton.addEventListener('click', () => {
+        closeAnyModal(loginModal);
+        setTimeout(() => {
+            welcomeModal.classList.remove('hidden'); // Mostra o modal de boas-vindas novamente após a animação
+        }, 300);
+    });
+}
+if (closeSignupModalButton) {
+    closeSignupModalButton.addEventListener('click', () => {
+        closeAnyModal(signupModal);
+        setTimeout(() => {
+            welcomeModal.classList.remove('hidden'); // Mostra o modal de boas-vindas novamente após a animação
+        }, 300);
+    });
+}
 if (closeModalButton) closeModalButton.addEventListener('click', () => closeAnyModal(addProductModal));
 if (backToLoginButton) {
     backToLoginButton.addEventListener('click', () => {
-        localStorage.removeItem('welcomeModalSeen');
         welcomeModal.classList.remove("hidden");
-        document.querySelector(".user-info").classList.add("hidden");
     });
 }
 

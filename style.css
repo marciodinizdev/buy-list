@@ -58,15 +58,13 @@ h1 {
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     color: white;
     font-size: 1rem;
-    background: rgb(2, 194, 2);
+    background: #ee3b3b;
     border: none;
     padding: 5px 20px;
     border-radius: 9px;
     cursor: pointer;
 }
-.user-info .logout-btn {
-    background-color:#ee3b3b;
-}
+
 
 #interface {
     margin: 10px;
@@ -380,7 +378,7 @@ footer #btn-area {
 }
 
 /* modal close button */
-#close-modal {
+#close-modal, .close-modal-btn {
     position: absolute;
     top: 10px;
     right: 15px;
@@ -437,4 +435,12 @@ footer #btn-area {
     font-style: italic;
     margin-top: -10px;
     margin-bottom: 10px;
+}
+
+#welcome-modal .modal-content .fields #login-welcome-btn {
+    background-color: #414141;
+}
+
+#welcome-modal .modal-content .fields #signup-welcome-btn {
+    background-color: #ee3b3b;
 }
