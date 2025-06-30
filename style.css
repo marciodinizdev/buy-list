@@ -424,3 +424,19 @@ footer #btn-area {
     gap: 10px;
 
 }
+
+/* Clear modal */
+#confirm-clear-modal .fields {
+    padding-bottom: 15px;
+
+}
+#confirm-clear-modal p {
+    color: #ee3b3b;
+    font-style: italic;
+}
+#confirm-clear-modal .modal-content .fields #confirm-clear-btn {
+    background-color: #ee3b3b;
+}
+#confirm-clear-modal .modal-content .fields #cancel-clear-btn {
+    background-color: #414141;
+}

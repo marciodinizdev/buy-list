@@ -42,9 +42,15 @@ const closeLoginModalButton = document.querySelector("#close-login-modal");
 const closeSignupModalButton = document.querySelector("#close-signup-modal");
 const backToLoginButton = document.querySelector("#back-to-login-btn");
 
+// Referências para o novo modal de confirmação de limpeza
+const confirmClearModal = document.querySelector("#confirm-clear-modal");
+const confirmClearButton = document.querySelector("#confirm-clear-btn");
+const cancelClearButton = document.querySelector("#cancel-clear-btn");
+const closeConfirmClearModalButton = document.querySelector("#close-confirm-clear-modal");
+
+
 let currentUser = null;
 
-// **NOVA FUNCIONALIDADE:** Funções de persistência de dados com Firestore
 async function saveProductToFirestore(product) {
     try {
         const docRef = await window.addDoc(window.collection(window.db, `users/${currentUser.uid}/shoppingLists`), product);
@@ -88,6 +94,22 @@ async function deleteProductFromFirestore(docId) {
     }
 }
 
+async function deleteAllProductsFromFirestore() {
+    if (!currentUser) return;
+
+    try {
+        const querySnapshot = await window.getDocs(window.collection(window.db, `users/${currentUser.uid}/shoppingLists`));
+        const deletePromises = [];
+        querySnapshot.forEach(doc => {
+            deletePromises.push(window.deleteDoc(window.doc(window.db, `users/${currentUser.uid}/shoppingLists`, doc.id)));
+        });
+        await Promise.all(deletePromises);
+        console.log("All products removed from firestore.");
+    } catch (e) {
+        console.error("Error removing all products from firestore: ", e);
+    }
+}
+
 async function updateProductStateInFirestore(docId, isChecked) {
     try {
         await window.updateDoc(window.doc(window.db, `users/${currentUser.uid}/shoppingLists`, docId), {
@@ -98,7 +120,6 @@ async function updateProductStateInFirestore(docId, isChecked) {
     }
 }
 
-// **NOVA FUNCIONALIDADE:** Lógica de autenticação
 if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -108,6 +129,7 @@ if (loginForm) {
             await window.signInWithEmailAndPassword(window.auth, email, password);
             closeAnyModal(loginModal);
             localStorage.setItem('welcomeModalSeen', 'true');
+            location.reload(); 
         } catch (error) {
             console.error("login error:", error.message);
             alert("login error: " + error.message);
@@ -128,13 +150,13 @@ if (signupForm) {
             await window.updateProfile(user, {
                 displayName: name
             });
-            await user.reload(); 
-            user = window.auth.currentUser;
             
             closeAnyModal(signupModal);
             localStorage.setItem('welcomeModalSeen', 'true');
             
             console.log("Profile updated successfully. DisplayName:", user.displayName);
+
+            location.reload();
         } catch (error) {
             console.error("signup error:", error.message);
             alert("signup error: " + error.message);
@@ -155,6 +177,7 @@ if (logoutButton) {
                 document.querySelector(".user-info").classList.add("hidden");
                 clearInterface();
                 console.log("user successfully logged out.");
+                location.reload();
             })
             .catch(error => console.error("error logging out:", error.message));
     });
@@ -183,7 +206,6 @@ window.onAuthStateChanged(window.auth, user => {
     }
 });
 
-// **NOVA FUNCIONALIDADE:** Funções de modal e animação
 function openLoginModal() {
     welcomeModal.classList.add("hidden");
     loginModal.classList.remove("hidden");
@@ -211,7 +233,17 @@ function closeAnyModal(modalElement) {
     }, 300);
 }
 
-// **NOVA FUNCIONALIDADE:** Event listeners para os botões do modal de boas-vindas
+// Nova função para abrir o modal de confirmação de limpeza
+function openConfirmClearModal() {
+    const modalContentElement = confirmClearModal.querySelector(".modal-content");
+    modalContentElement.classList.add("scale-in");
+    confirmClearModal.classList.remove("hidden");
+    setTimeout(() => {
+        modalContentElement.classList.remove("scale-in");
+    }, 300);
+}
+
+
 if (loginWelcomeButton) loginWelcomeButton.addEventListener('click', openLoginModal);
 if (signupWelcomeButton) signupWelcomeButton.addEventListener('click', openSignupModal);
 if (guestButton) guestButton.addEventListener('click', () => {
@@ -226,7 +258,6 @@ if (guestButton) guestButton.addEventListener('click', () => {
     }, 300);
 });
 
-// **CORREÇÃO:** Botões de fechar de login/cadastro agora voltam para o modal de boas-vindas após a animação de saída
 if (closeLoginModalButton) {
     closeLoginModalButton.addEventListener('click', () => {
         closeAnyModal(loginModal);
@@ -244,6 +275,9 @@ if (closeSignupModalButton) {
     });
 }
 if (closeModalButton) closeModalButton.addEventListener('click', () => closeAnyModal(addProductModal));
+// Event listener para fechar o novo modal de confirmação de limpeza
+if (closeConfirmClearModalButton) closeModalButton.addEventListener('click', () => closeAnyModal(confirmClearModal));
+
 if (backToLoginButton) {
     backToLoginButton.addEventListener('click', () => {
         welcomeModal.classList.remove("hidden");
@@ -254,7 +288,6 @@ if (backToLoginButton) {
     });
 }
 
-// **CÓDIGO ORIGINAL, APENAS REORGANIZADO E ADICIONADO LÓGICA DE PERSISTÊNCIA**
 function createProductElement(name, quantity) {
     const contentArea = document.createElement("section");
     contentArea.className = "content-area";
@@ -426,10 +459,13 @@ function checkIfInterfaceIsEmpty() {
     }
 }
 
+// A função clearInterface agora recebe um parâmetro para apagar ou não do storage/Firestore
 function clearInterface(clearFromStorage = true) {
     shoppingListInterface.innerHTML = "";
     if (clearFromStorage) {
-        if (currentUser) {}
+        if (currentUser) {
+            deleteAllProductsFromFirestore(); // Chamada para a nova função de apagar tudo do Firestore
+        }
     }
     checkIfInterfaceIsEmpty();
 }
@@ -447,10 +483,29 @@ deleteProductButtons.forEach(button => {
 
 confirmButton.addEventListener('click', addNewProduct);
 
-clearProductsButton.addEventListener('click', () => {
-    clearInterface();
-    playClearSound();
+// Modifica o evento do clearProductsButton para abrir o modal de confirmação
+clearProductsButton.addEventListener('click', openConfirmClearModal);
+
+// Adiciona event listeners para os botões do novo modal de confirmação
+confirmClearButton.addEventListener('click', () => {
+    closeAnyModal(confirmClearModal); // Fecha o modal de confirmação
+    setTimeout(() => { // Pequeno delay para a animação do modal
+        clearInterface(true); // Limpa a interface e o Firestore
+        playClearSound();
+    }, 300);
 });
+
+cancelClearButton.addEventListener('click', () => {
+    closeAnyModal(confirmClearModal); // Apenas fecha o modal
+});
+
+// Listener para o botão de fechar do modal de confirmação
+if (closeConfirmClearModalButton) {
+    closeConfirmClearModalButton.addEventListener('click', () => {
+        closeAnyModal(confirmClearModal);
+    });
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
     checkIfInterfaceIsEmpty();
