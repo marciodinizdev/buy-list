@@ -2,7 +2,6 @@
 const shoppingListInterface = document.querySelector("#interface");
 const confirmButton = document.querySelector("#ok-modal");
 const addProductButton = document.querySelector("#add-prod");
-const deleteProductButtons = document.querySelectorAll('.del-prod');
 const clearProductsButton = document.querySelector('#clear-prod');
 const closeModalButton = document.querySelector("#close-modal");
 const confirmMessage = document.querySelector(".confirm-msg");
@@ -48,6 +47,7 @@ const confirmClearButton = document.querySelector("#confirm-clear-btn");
 const cancelClearButton = document.querySelector("#cancel-clear-btn");
 const closeConfirmClearModalButton = document.querySelector("#close-confirm-clear-modal");
 
+let isBulkEditMode = false;
 
 let currentUser = null;
 
@@ -69,15 +69,9 @@ async function loadShoppingListFromFirestore() {
         const querySnapshot = await window.getDocs(window.collection(window.db, `users/${currentUser.uid}/shoppingLists`));
         querySnapshot.forEach(doc => {
             const product = doc.data();
-            const newProduct = createProductElement(product.name, product.quantity);
+            const newProduct = createProductElement(product.name, product.quantity, product.checked);
             newProduct.dataset.docId = doc.id;
             shoppingListInterface.appendChild(newProduct);
-            if (product.checked) {
-                newProduct.querySelector('.prod-checkbox').checked = true;
-                newProduct.querySelector('.prod-area').classList.add('checked');
-                newProduct.querySelector('.prod-name').classList.add('checked');
-                newProduct.querySelector('.prod-qt').classList.add('checked');
-            }
         });
         checkIfInterfaceIsEmpty();
     } catch (e) {
@@ -107,6 +101,18 @@ async function deleteAllProductsFromFirestore() {
         console.log("All products removed from firestore.");
     } catch (e) {
         console.error("Error removing all products from firestore: ", e);
+    }
+}
+
+async function updateProductInFirestore(docId, newName, newQuantity) {
+    try {
+        await window.updateDoc(window.doc(window.db, `users/${currentUser.uid}/shoppingLists`, docId), {
+            name: newName,
+            quantity: newQuantity
+        });
+        console.log("Product updated in Firestore.");
+    } catch (e) {
+        console.error("Error updating product in Firestore: ", e);
     }
 }
 
@@ -192,7 +198,7 @@ window.onAuthStateChanged(window.auth, user => {
         userGreeting.classList.remove("display-none");
         logoutButton.classList.remove("display-none");
         if (backToLoginButton) backToLoginButton.classList.add("display-none");
-        recoverProductsButton.classList.add("hidden"); 
+        recoverProductsButton.classList.remove("hidden");
         loadShoppingListFromFirestore();
     } else {
         currentUser = null;
@@ -233,7 +239,6 @@ function closeAnyModal(modalElement) {
     }, 300);
 }
 
-// Nova função para abrir o modal de confirmação de limpeza
 function openConfirmClearModal() {
     const modalContentElement = confirmClearModal.querySelector(".modal-content");
     modalContentElement.classList.add("scale-in");
@@ -275,8 +280,7 @@ if (closeSignupModalButton) {
     });
 }
 if (closeModalButton) closeModalButton.addEventListener('click', () => closeAnyModal(addProductModal));
-// Event listener para fechar o novo modal de confirmação de limpeza
-if (closeConfirmClearModalButton) closeModalButton.addEventListener('click', () => closeAnyModal(confirmClearModal));
+if (closeConfirmClearModalButton) closeConfirmClearModalButton.addEventListener('click', () => closeAnyModal(confirmClearModal));
 
 if (backToLoginButton) {
     backToLoginButton.addEventListener('click', () => {
@@ -288,12 +292,15 @@ if (backToLoginButton) {
     });
 }
 
-function createProductElement(name, quantity) {
+function createProductElement(name, quantity, isChecked = false) {
     const contentArea = document.createElement("section");
     contentArea.className = "content-area";
 
     const productArea = document.createElement("section");
     productArea.className = "prod-area";
+
+    const leftSide = document.createElement("div");
+    leftSide.className = "left-side";
 
     const checkDiv = document.createElement("label");
     checkDiv.className = "check";
@@ -301,15 +308,75 @@ function createProductElement(name, quantity) {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.className = "prod-checkbox";
+    checkbox.checked = isChecked;
 
     const customCheckbox = document.createElement("span");
     customCheckbox.className = "check-custom";
 
+    const nameDiv = document.createElement("div");
+    nameDiv.className = "prod-name";
+    nameDiv.textContent = name;
+
+    const qtDiv = document.createElement("div");
+    qtDiv.className = "prod-qt";
+    qtDiv.textContent = `${quantity}`;
+
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.className = "prod-name-input display-none";
+    nameInput.value = name;
+    nameInput.maxLength = 25;
+
+    const qtInput = document.createElement("input");
+    qtInput.type = "number";
+    qtInput.className = "prod-qt-input display-none";
+    qtInput.value = quantity;
+    qtInput.min = "1";
+    qtInput.max = "99";
+    qtInput.oninput = function() {
+        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 2);
+    };
+
+    const editActionsDiv = document.createElement("div");
+    editActionsDiv.className = "edit-actions display-none";
+
+    const saveButton = document.createElement("button");
+    saveButton.className = "save-edit-btn";
+    saveButton.innerHTML = `<span class="material-symbols-rounded">save</span>`;
+    saveButton.addEventListener('click', async () => {
+        const newName = nameInput.value.trim();
+        const newQuantity = parseInt(qtInput.value.trim());
+
+        if (newName && newQuantity > 0) {
+            if (currentUser) {
+                await updateProductInFirestore(contentArea.dataset.docId, newName, newQuantity);
+            }
+            nameDiv.textContent = newName;
+            qtDiv.textContent = newQuantity;
+            confirmFadeIn();
+            toggleProductEditState(contentArea, false);
+            updateProductDisplay(contentArea, checkbox.checked);
+        } else {
+            errorFadeIn();
+        }
+    });
+
+    const cancelButton = document.createElement("button");
+    cancelButton.className = "cancel-edit-btn";
+    cancelButton.innerHTML = `<span class="material-symbols-rounded">cancel</span>`;
+    cancelButton.addEventListener('click', () => {
+        nameInput.value = nameDiv.textContent;
+        qtInput.value = qtDiv.textContent;
+        toggleProductEditState(contentArea, false);
+        updateProductDisplay(contentArea, checkbox.checked);
+    });
+
+    editActionsDiv.appendChild(saveButton);
+    editActionsDiv.appendChild(cancelButton);
+
     const toggleCheckState = () => {
         const isChecked = checkbox.checked;
-        productArea.classList.toggle('checked', isChecked);
-        nameDiv.classList.toggle('checked', isChecked);
-        qtDiv.classList.toggle('checked', isChecked);
+        updateProductDisplay(contentArea, isChecked);
         if (currentUser) {
             const docId = contentArea.dataset.docId;
             if (docId) {
@@ -319,6 +386,7 @@ function createProductElement(name, quantity) {
     };
 
     productArea.addEventListener('click', (e) => {
+        if (isBulkEditMode) return; 
         if (e.target.closest('.check')) return;
         checkbox.checked = !checkbox.checked;
         toggleCheckState();
@@ -329,36 +397,75 @@ function createProductElement(name, quantity) {
     checkDiv.appendChild(checkbox);
     checkDiv.appendChild(customCheckbox);
 
-    const nameDiv = document.createElement("div");
-    nameDiv.className = "prod-name";
-    nameDiv.textContent = name;
-
-    const qtDiv = document.createElement("div");
-    qtDiv.className = "prod-qt";
-    qtDiv.textContent = `${quantity}`;
-
     const deleteButton = document.createElement("button");
     deleteButton.className = "del-prod";
-
     const deleteIcon = document.createElement("span");
     deleteIcon.className = "material-symbols-rounded";
     deleteIcon.textContent = "delete";
-
     deleteButton.appendChild(deleteIcon);
     deleteButton.addEventListener('click', deleteOneProduct);
 
-    const leftSide = document.createElement("div");
-    leftSide.className = "left-side";
     leftSide.appendChild(checkDiv);
     leftSide.appendChild(nameDiv);
+    leftSide.appendChild(nameInput);
 
     productArea.appendChild(leftSide);
     productArea.appendChild(qtDiv);
+    productArea.appendChild(qtInput);
+    productArea.appendChild(editActionsDiv);
 
     contentArea.appendChild(productArea);
     contentArea.appendChild(deleteButton);
 
+    updateProductDisplay(contentArea, isChecked);
+    
+    if (isBulkEditMode) {
+        toggleProductEditState(contentArea, true);
+    }
+
     return contentArea;
+}
+
+function updateProductDisplay(contentArea, isChecked) {
+    const productArea = contentArea.querySelector('.prod-area');
+    const nameDiv = contentArea.querySelector('.prod-name');
+    const qtDiv = contentArea.querySelector('.prod-qt');
+    const checkbox = contentArea.querySelector('.prod-checkbox');
+
+    productArea.classList.toggle('checked', isChecked);
+    nameDiv.classList.toggle('checked', isChecked);
+    qtDiv.classList.toggle('checked', isChecked);
+    checkbox.checked = isChecked;
+}
+
+function toggleProductEditState(contentArea, enableEdit) {
+    const productArea = contentArea.querySelector('.prod-area');
+    const nameDiv = contentArea.querySelector('.prod-name');
+    const qtDiv = contentArea.querySelector('.prod-qt');
+    const nameInput = contentArea.querySelector('.prod-name-input');
+    const qtInput = contentArea.querySelector('.prod-qt-input');
+    const editActionsDiv = contentArea.querySelector('.edit-actions');
+    const deleteButton = contentArea.querySelector('.del-prod');
+
+    if (enableEdit) {
+        productArea.classList.add('edit-mode');
+        contentArea.classList.add('edit-mode');
+        nameDiv.classList.add('display-none');
+        qtDiv.classList.add('display-none');
+        nameInput.classList.remove('display-none');
+        qtInput.classList.remove('display-none');
+        editActionsDiv.classList.remove('display-none');
+        if (deleteButton) deleteButton.classList.add('display-none');
+    } else {
+        productArea.classList.remove('edit-mode');
+        contentArea.classList.remove('edit-mode');
+        nameDiv.classList.remove('display-none');
+        qtDiv.classList.remove('display-none');
+        nameInput.classList.add('display-none');
+        qtInput.classList.add('display-none');
+        editActionsDiv.classList.add('display-none');
+        if (deleteButton) deleteButton.classList.remove('display-none');
+    }
 }
 
 function deleteOneProduct(event) {
@@ -427,7 +534,7 @@ async function addNewProduct() {
             if (currentUser) {
                 docId = await saveProductToFirestore(productData);
             }
-            const newProductElement = createProductElement(name, quantity);
+            const newProductElement = createProductElement(name, quantity, false); 
             if (docId) {
                 newProductElement.dataset.docId = docId;
             }
@@ -459,53 +566,62 @@ function checkIfInterfaceIsEmpty() {
     }
 }
 
-// A função clearInterface agora recebe um parâmetro para apagar ou não do storage/Firestore
 function clearInterface(clearFromStorage = true) {
     shoppingListInterface.innerHTML = "";
     if (clearFromStorage) {
         if (currentUser) {
-            deleteAllProductsFromFirestore(); // Chamada para a nova função de apagar tudo do Firestore
+            deleteAllProductsFromFirestore(); 
         }
     }
     checkIfInterfaceIsEmpty();
 }
 
 if (recoverProductsButton) {
-    recoverProductsButton.addEventListener('click', () => {});
+    recoverProductsButton.addEventListener('click', () => {
+        if (!currentUser) {
+            alert("Faça login para usar o modo de edição!");
+            return;
+        }
+
+        isBulkEditMode = !isBulkEditMode;
+
+        const allProducts = document.querySelectorAll('.content-area');
+        allProducts.forEach(productElement => {
+            toggleProductEditState(productElement, isBulkEditMode);
+        });
+
+        if (isBulkEditMode) {
+            recoverProductsButton.style.backgroundColor = '#623ce8';
+        } else {
+            recoverProductsButton.style.backgroundColor = '#414141';
+        }
+    });
 }
 
 addFirstProductButton.addEventListener("click", openModal);
 addProductButton.addEventListener("click", openModal);
 
-deleteProductButtons.forEach(button => {
-    button.addEventListener('click', deleteOneProduct);
-});
-
 confirmButton.addEventListener('click', addNewProduct);
 
-// Modifica o evento do clearProductsButton para abrir o modal de confirmação
 clearProductsButton.addEventListener('click', openConfirmClearModal);
 
-// Adiciona event listeners para os botões do novo modal de confirmação
 confirmClearButton.addEventListener('click', () => {
-    closeAnyModal(confirmClearModal); // Fecha o modal de confirmação
-    setTimeout(() => { // Pequeno delay para a animação do modal
-        clearInterface(true); // Limpa a interface e o Firestore
+    closeAnyModal(confirmClearModal);
+    setTimeout(() => {
+        clearInterface(true);
         playClearSound();
     }, 300);
 });
 
 cancelClearButton.addEventListener('click', () => {
-    closeAnyModal(confirmClearModal); // Apenas fecha o modal
+    closeAnyModal(confirmClearModal);
 });
 
-// Listener para o botão de fechar do modal de confirmação
 if (closeConfirmClearModalButton) {
     closeConfirmClearModalButton.addEventListener('click', () => {
         closeAnyModal(confirmClearModal);
     });
 }
-
 
 document.addEventListener('DOMContentLoaded', () => {
     checkIfInterfaceIsEmpty();
