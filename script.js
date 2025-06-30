@@ -91,7 +91,6 @@ async function saveProductToFirestore(product) {
 }
 
 async function loadShoppingListFromFirestore() {
-    clearInterface(false);
     if (!currentUser) return;
 
     try {
@@ -103,6 +102,7 @@ async function loadShoppingListFromFirestore() {
             firebaseProducts.push(product);
         });
         
+        clearInterface(false);
         firebaseProducts.forEach(product => {
             const newProduct = createProductElement(product.name, product.quantity, product.checked);
             newProduct.dataset.docId = product.docId;
@@ -111,8 +111,7 @@ async function loadShoppingListFromFirestore() {
         saveShoppingListToLocalStorage();
         checkIfInterfaceIsEmpty();
     } catch (e) {
-        console.error("error loading list from firestore: ", e);
-        loadShoppingListFromLocalStorage();
+        console.error("error loading list from firestore (possibly offline): ", e);
     }
 }
 
@@ -207,6 +206,7 @@ if (signupForm) {
 
 if (logoutButton) {
     logoutButton.addEventListener("click", () => {
+        const userUidToClear = currentUser ? currentUser.uid : null;
         window.signOut(window.auth)
             .then(() => {
                 localStorage.removeItem('welcomeModalSeen');
@@ -217,7 +217,11 @@ if (logoutButton) {
                 setTimeout(() => content.classList.remove("scale-in"), 300);
                 document.querySelector(".user-info").classList.add("hidden");
                 clearInterface();
-                localStorage.removeItem(`shoppingList_${currentUser ? currentUser.uid : 'guest'}`);
+                if (userUidToClear) {
+                    localStorage.removeItem(`shoppingList_${userUidToClear}`);
+                } else {
+                    localStorage.removeItem('shoppingListGuest');
+                }
                 location.reload();
             })
             .catch(error => console.error("error logging out:", error.message));
@@ -233,7 +237,15 @@ window.onAuthStateChanged(window.auth, user => {
         userGreeting.classList.remove("display-none");
         logoutButton.classList.remove("display-none");
         if (backToLoginButton) backToLoginButton.classList.add("display-none");
-        loadShoppingListFromFirestore();
+        
+        loadShoppingListFromLocalStorage(); 
+
+        if (navigator.onLine) {
+            loadShoppingListFromFirestore();
+        } else {
+            console.log("Offline: Using local data for logged-in user.");
+        }
+
     } else {
         currentUser = null;
         document.querySelector(".user-info").classList.remove("hidden");
@@ -241,6 +253,7 @@ window.onAuthStateChanged(window.auth, user => {
         userGreeting.innerHTML = `Modo <span style="color:#523cb4; font-weight: bold;" >VISITANTE</span>`;
         if (backToLoginButton) backToLoginButton.classList.remove("display-none");
         logoutButton.classList.add("display-none");
+        
         loadShoppingListFromLocalStorage();
     }
 });
