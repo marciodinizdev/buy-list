@@ -50,6 +50,7 @@ let isCompactMode = false;
 
 let currentUser = null;
 
+<<<<<<< HEAD
 // getLocalStorageKey agora só é relevante para o modo convidado
 function getLocalStorageKey() {
     return 'shoppingListGuest';
@@ -81,10 +82,13 @@ function loadShoppingListFromLocalStorageGuest() {
     checkIfInterfaceIsEmpty();
 }
 
+=======
+>>>>>>> parent of 3559e85 (Update script.js)
 async function saveProductToFirestore(product) {
     if (!currentUser) return null; // Apenas para usuários logados
     try {
         const docRef = await window.addDoc(window.collection(window.db, `users/${currentUser.uid}/shoppingLists`), product);
+        console.log("product added to firestore with ID: ", docRef.id);
         return docRef.id;
     } catch (e) {
         console.error("error adding product to firestore: ", e);
@@ -108,7 +112,10 @@ async function loadShoppingListFromFirestore() {
         checkIfInterfaceIsEmpty();
     } catch (e) {
         console.error("error loading list from firestore: ", e);
+<<<<<<< HEAD
         // O Firestore com persistência lida com o offline, não precisamos de um fallback manual aqui.
+=======
+>>>>>>> parent of 3559e85 (Update script.js)
     }
 }
 
@@ -116,6 +123,7 @@ async function deleteProductFromFirestore(docId) {
     if (!currentUser) return; // Apenas para usuários logados
     try {
         await window.deleteDoc(window.doc(window.db, `users/${currentUser.uid}/shoppingLists`, docId));
+        console.log("product removed from firestore.");
     } catch (e) {
         console.error("error removing product from firestore: ", e);
     }
@@ -131,19 +139,24 @@ async function deleteAllProductsFromFirestore() {
             deletePromises.push(window.deleteDoc(window.doc(window.db, `users/${currentUser.uid}/shoppingLists`, doc.id)));
         });
         await Promise.all(deletePromises);
+        console.log("All products removed from firestore.");
     } catch (e) {
         console.error("Error removing all products from firestore: ", e);
     }
 }
 
+<<<<<<< HEAD
 async function updateProductInFirestore(docId, newName, newQuantity, isChecked) {
     if (!currentUser) return; // Apenas para usuários logados
+=======
+async function updateProductInFirestore(docId, newName, newQuantity) {
+>>>>>>> parent of 3559e85 (Update script.js)
     try {
         await window.updateDoc(window.doc(window.db, `users/${currentUser.uid}/shoppingLists`, docId), {
             name: newName,
-            quantity: newQuantity,
-            checked: isChecked
+            quantity: newQuantity
         });
+        console.log("Product updated in Firestore.");
     } catch (e) {
         console.error("Error updating product in Firestore: ", e);
     }
@@ -169,7 +182,10 @@ if (loginForm) {
             await window.signInWithEmailAndPassword(window.auth, email, password);
             closeAnyModal(loginModal);
             localStorage.setItem('welcomeModalSeen', 'true');
+<<<<<<< HEAD
             localStorage.removeItem('shoppingListGuest'); // Limpa a lista de convidado ao logar
+=======
+>>>>>>> parent of 3559e85 (Update script.js)
             location.reload(); 
         } catch (error) {
             console.error("login error:", error.message);
@@ -194,8 +210,13 @@ if (signupForm) {
             
             closeAnyModal(signupModal);
             localStorage.setItem('welcomeModalSeen', 'true');
+<<<<<<< HEAD
             localStorage.removeItem('shoppingListGuest'); // Limpa a lista de convidado ao cadastrar
+=======
+>>>>>>> parent of 3559e85 (Update script.js)
             
+            console.log("Profile updated successfully. DisplayName:", user.displayName);
+
             location.reload();
         } catch (error) {
             console.error("signup error:", error.message);
@@ -215,8 +236,13 @@ if (logoutButton) {
                 content.classList.add("scale-in");
                 setTimeout(() => content.classList.remove("scale-in"), 300);
                 document.querySelector(".user-info").classList.add("hidden");
+<<<<<<< HEAD
                 clearInterface(false); // Não limpa o Firestore, a conta ainda existe
                 localStorage.removeItem('shoppingListGuest'); // Garante que a lista de convidado é limpa
+=======
+                clearInterface();
+                console.log("user successfully logged out.");
+>>>>>>> parent of 3559e85 (Update script.js)
                 location.reload();
             })
             .catch(error => console.error("error logging out:", error.message));
@@ -242,8 +268,12 @@ window.onAuthStateChanged(window.auth, user => {
         userGreeting.innerHTML = `Modo <span style="color:#523cb4; font-weight: bold;" >VISITANTE</span>`;
         if (backToLoginButton) backToLoginButton.classList.remove("display-none");
         logoutButton.classList.add("display-none");
+<<<<<<< HEAD
         
         loadShoppingListFromLocalStorageGuest(); // Carrega lista do localStorage (para convidado)
+=======
+        clearInterface(false);
+>>>>>>> parent of 3559e85 (Update script.js)
     }
 });
 
@@ -293,7 +323,11 @@ if (guestButton) guestButton.addEventListener('click', () => {
         welcomeModal.classList.add("hidden");
         content.classList.remove("scale-out");
         localStorage.setItem('welcomeModalSeen', 'true');
+<<<<<<< HEAD
         loadShoppingListFromLocalStorageGuest();
+=======
+        clearInterface(false);
+>>>>>>> parent of 3559e85 (Update script.js)
         document.querySelector(".user-info").classList.remove("hidden");
     }, 300);
 });
@@ -381,19 +415,26 @@ function createProductElement(name, quantity, isChecked = false) {
     saveButton.addEventListener('click', async () => {
         const newName = nameInput.value.trim();
         const newQuantity = parseInt(qtInput.value.trim());
-        const isChecked = checkbox.checked;
 
         if (newName && newQuantity > 0) {
             if (currentUser) {
+<<<<<<< HEAD
                 await updateProductInFirestore(contentArea.dataset.docId, newName, newQuantity, isChecked);
             } else {
                 saveShoppingListToLocalStorageGuest();
+=======
+                await updateProductInFirestore(contentArea.dataset.docId, newName, newQuantity);
+>>>>>>> parent of 3559e85 (Update script.js)
             }
             nameDiv.textContent = newName;
             qtDiv.textContent = newQuantity;
             confirmFadeIn();
             toggleProductEditState(contentArea, false);
+<<<<<<< HEAD
             updateProductDisplay(contentArea, isChecked);
+=======
+            updateProductDisplay(contentArea, checkbox.checked);
+>>>>>>> parent of 3559e85 (Update script.js)
         } else {
             errorFadeIn();
         }
@@ -507,11 +548,11 @@ function deleteOneProduct(event) {
     if (contentArea) {
         contentArea.classList.add('scale-out');
         playBubbleSound();
-        setTimeout(async () => {
+        setTimeout(() => {
             if (currentUser) {
                 const docId = contentArea.dataset.docId;
                 if (docId) {
-                    await deleteProductFromFirestore(docId);
+                    deleteProductFromFirestore(docId);
                 }
             } else {
                 saveShoppingListToLocalStorageGuest();
@@ -565,6 +606,7 @@ async function addNewProduct() {
         setTimeout(async () => {
             playBubbleSound();
             const productData = { name: name, quantity: quantity, checked: false };
+<<<<<<< HEAD
             let newProductElement = createProductElement(name, quantity, false); 
             
             if (currentUser) {
@@ -574,8 +616,17 @@ async function addNewProduct() {
                 }
             } else {
                 saveShoppingListToLocalStorageGuest();
+=======
+            let docId = null;
+
+            if (currentUser) {
+                docId = await saveProductToFirestore(productData);
             }
-            
+            const newProductElement = createProductElement(name, quantity, false); 
+            if (docId) {
+                newProductElement.dataset.docId = docId;
+>>>>>>> parent of 3559e85 (Update script.js)
+            }
             shoppingListInterface.appendChild(newProductElement);
             confirmFadeIn();
             checkIfInterfaceIsEmpty();
@@ -674,7 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCompactButtonIcon();
 });
 
-
+// Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/service-worker.js')
