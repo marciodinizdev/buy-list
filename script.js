@@ -1,4 +1,3 @@
-// DOM element references
 const shoppingListInterface = document.querySelector("#interface");
 const confirmButton = document.querySelector("#ok-modal");
 const addProductButton = document.querySelector("#add-prod");
@@ -25,7 +24,6 @@ function playClearSound() {
     clearSound.play();
 }
 
-// references for authentication elements
 const welcomeModal = document.querySelector("#welcome-modal");
 const loginModal = document.querySelector("#login-modal");
 const signupModal = document.querySelector("#signup-modal");
@@ -40,11 +38,15 @@ const closeLoginModalButton = document.querySelector("#close-login-modal");
 const closeSignupModalButton = document.querySelector("#close-signup-modal");
 const backToLoginButton = document.querySelector("#back-to-login-btn");
 
-// references for clear modal
 const confirmClearModal = document.querySelector("#confirm-clear-modal");
 const confirmClearButton = document.querySelector("#confirm-clear-btn");
 const cancelClearButton = document.querySelector("#cancel-clear-btn");
 const closeConfirmClearModalButton = document.querySelector("#close-confirm-clear-modal");
+
+const compactListButton = document.querySelector('#compact-list');
+const body = document.body;
+
+let isCompactMode = false;
 
 let currentUser = null;
 
@@ -565,6 +567,17 @@ function clearInterface(clearFromStorage = true) {
     checkIfInterfaceIsEmpty();
 }
 
+function updateCompactButtonIcon() {
+    const iconSpan = compactListButton.querySelector('.material-symbols-rounded');
+    if (iconSpan) {
+        if (isCompactMode) {
+            iconSpan.textContent = 'view_list';
+        } else {
+            iconSpan.textContent = 'grid_view';
+        }
+    }
+}
+
 addFirstProductButton.addEventListener("click", openModal);
 addProductButton.addEventListener("click", openModal);
 
@@ -590,6 +603,14 @@ if (closeConfirmClearModalButton) {
     });
 }
 
+if (compactListButton) {
+    compactListButton.addEventListener('click', () => {
+        isCompactMode = !isCompactMode;
+        body.classList.toggle('compact-mode', isCompactMode);
+        updateCompactButtonIcon();
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     checkIfInterfaceIsEmpty();
     
@@ -601,4 +622,5 @@ document.addEventListener('DOMContentLoaded', () => {
         welcomeModal.classList.add("hidden");
         document.querySelector(".user-info").classList.remove("hidden");
     }
+    updateCompactButtonIcon();
 });

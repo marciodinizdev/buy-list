@@ -440,3 +440,39 @@ footer #btn-area {
 #confirm-clear-modal .modal-content .fields #cancel-clear-btn {
     background-color: #414141;
 }
+
+/* Compact Mode Styles */
+.compact-mode #interface {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 5px; /* Space between grid items horizontally */
+    /* max-width is kept from original #interface rule */
+}
+
+.compact-mode .content-area {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.compact-mode .content-area .prod-area {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding: 8px 10px;
+}
+
+.compact-mode .prod-area .prod-qt,
+.compact-mode .del-prod {
+    display: none;
+}
+
+.compact-mode .prod-area .left-side {
+    gap: 1rem;
+}
+
+.compact-mode .prod-area .prod-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 35px); /* Adjusted to account for checkbox width */
+}
