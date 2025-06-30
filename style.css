@@ -358,7 +358,7 @@ footer #btn-area {
     cursor: pointer;
 }
 
-/* styling for confirm-btn to ensure all buttons with this class are styled */
+/* confirm-btn to ensure all buttons with this class are styled */
 .confirm-btn {
     margin-top: 1rem;
     background-color: var(--primary-color);
@@ -372,7 +372,7 @@ footer #btn-area {
     font-size: 1.2rem;
 }
 
-/* styling for the welcome modal */
+/* welcome modal */
 #welcome-modal .modal-content h3 {
     margin-bottom: 1.5rem;
 }
@@ -409,4 +409,18 @@ footer #btn-area {
 
 #welcome-modal .modal-content .fields #signup-welcome-btn {
     background-color: #ee3b3b;
+}
+
+.modal-content .fields #signup-form, #login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.modal-content .fields #signup-form div, #login-form div {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-right: 20px;
+    gap: 10px;
+
 }
