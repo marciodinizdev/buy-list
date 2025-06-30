@@ -1,4 +1,3 @@
-//DOM selection
 const shoppingListInterface = document.querySelector("#interface");
 const confirmButton = document.querySelector("#ok-modal");
 const addProductButton = document.querySelector("#add-prod");
