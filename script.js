@@ -50,113 +50,80 @@ let isCompactMode = false;
 
 let currentUser = null;
 
+// getLocalStorageKey agora só é relevante para o modo convidado
 function getLocalStorageKey() {
-    return currentUser ? `shoppingList_${currentUser.uid}` : 'shoppingListGuest';
+    return 'shoppingListGuest';
 }
 
-function saveShoppingListToLocalStorage() {
+function saveShoppingListToLocalStorageGuest() {
     const products = [];
     document.querySelectorAll('.content-area').forEach(productElement => {
         products.push({
             name: productElement.querySelector('.prod-name').textContent,
             quantity: productElement.querySelector('.prod-qt').textContent,
-            checked: productElement.querySelector('.prod-checkbox').checked,
-            docId: productElement.dataset.docId || null // Adiciona o docId para produtos do Firebase
+            checked: productElement.querySelector('.prod-checkbox').checked
+            // docId não é relevante para o convidado, pois não usa Firestore
         });
     });
     localStorage.setItem(getLocalStorageKey(), JSON.stringify(products));
 }
 
-function loadShoppingListFromLocalStorage() {
-    clearInterface(false); // Limpa a UI antes de carregar
+function loadShoppingListFromLocalStorageGuest() {
+    clearInterface(false);
     const storedList = localStorage.getItem(getLocalStorageKey());
     if (storedList) {
         const products = JSON.parse(storedList);
         products.forEach(product => {
             const newProduct = createProductElement(product.name, product.quantity, product.checked);
-            newProduct.dataset.docId = product.docId; // Restaura o docId
             shoppingListInterface.appendChild(newProduct);
         });
     }
     checkIfInterfaceIsEmpty();
 }
 
-async function saveProductToFirestore(product, docId = null) {
-    if (!currentUser || !navigator.onLine) {
-        console.log("Offline ou sem usuário logado, não salvando no Firestore.");
-        return null;
-    }
+async function saveProductToFirestore(product) {
+    if (!currentUser) return null; // Apenas para usuários logados
     try {
-        let docRef;
-        if (docId) {
-            await window.updateDoc(window.doc(window.db, `users/${currentUser.uid}/shoppingLists`, docId), product);
-            docRef = { id: docId };
-        } else {
-            docRef = await window.addDoc(window.collection(window.db, `users/${currentUser.uid}/shoppingLists`), product);
-        }
-        console.log("product added/updated in firestore with ID: ", docRef.id);
+        const docRef = await window.addDoc(window.collection(window.db, `users/${currentUser.uid}/shoppingLists`), product);
         return docRef.id;
     } catch (e) {
-        console.error("error adding/updating product to firestore: ", e);
+        console.error("error adding product to firestore: ", e);
         return null;
     }
 }
 
-async function loadShoppingListFromFirestoreAndSync() {
-    if (!currentUser || !navigator.onLine) {
-        console.log("Offline ou sem usuário logado, não sincronizando com Firestore.");
-        return;
-    }
+async function loadShoppingListFromFirestore() {
+    clearInterface(false);
+    if (!currentUser) return; // Apenas para usuários logados
 
     try {
+        // Com enablePersistence, esta chamada buscará do cache local se offline
         const querySnapshot = await window.getDocs(window.collection(window.db, `users/${currentUser.uid}/shoppingLists`));
-        const firebaseProducts = [];
         querySnapshot.forEach(doc => {
             const product = doc.data();
-            product.docId = doc.id;
-            firebaseProducts.push(product);
+            const newProduct = createProductElement(product.name, product.quantity, product.checked);
+            newProduct.dataset.docId = doc.id;
+            shoppingListInterface.appendChild(newProduct);
         });
-        
-        // Substitui a lista local pela do Firebase se for diferente
-        // ou se não houver lista local ainda
-        const currentLocalList = JSON.parse(localStorage.getItem(getLocalStorageKey()) || '[]');
-        if (JSON.stringify(currentLocalList) !== JSON.stringify(firebaseProducts)) {
-            console.log("Sincronizando lista do Firestore para o LocalStorage.");
-            clearInterface(false); // Limpa a UI antes de renderizar a lista do Firestore
-            firebaseProducts.forEach(product => {
-                const newProduct = createProductElement(product.name, product.quantity, product.checked);
-                newProduct.dataset.docId = product.docId;
-                shoppingListInterface.appendChild(newProduct);
-            });
-            saveShoppingListToLocalStorage(); // Salva a lista do Firebase no localStorage
-            checkIfInterfaceIsEmpty();
-        } else {
-            console.log("Lista do Firestore e LocalStorage já sincronizadas.");
-        }
-
+        checkIfInterfaceIsEmpty();
     } catch (e) {
-        console.error("error loading list from firestore for sync: ", e);
+        console.error("error loading list from firestore: ", e);
+        // O Firestore com persistência lida com o offline, não precisamos de um fallback manual aqui.
     }
 }
 
 async function deleteProductFromFirestore(docId) {
-    if (!currentUser || !navigator.onLine) {
-        console.log("Offline ou sem usuário logado, não excluindo do Firestore.");
-        return;
-    }
+    if (!currentUser) return; // Apenas para usuários logados
     try {
         await window.deleteDoc(window.doc(window.db, `users/${currentUser.uid}/shoppingLists`, docId));
-        console.log("product removed from firestore.");
     } catch (e) {
         console.error("error removing product from firestore: ", e);
     }
 }
 
 async function deleteAllProductsFromFirestore() {
-    if (!currentUser || !navigator.onLine) {
-        console.log("Offline ou sem usuário logado, não excluindo tudo do Firestore.");
-        return;
-    }
+    if (!currentUser) return; // Apenas para usuários logados
+
     try {
         const querySnapshot = await window.getDocs(window.collection(window.db, `users/${currentUser.uid}/shoppingLists`));
         const deletePromises = [];
@@ -164,34 +131,26 @@ async function deleteAllProductsFromFirestore() {
             deletePromises.push(window.deleteDoc(window.doc(window.db, `users/${currentUser.uid}/shoppingLists`, doc.id)));
         });
         await Promise.all(deletePromises);
-        console.log("All products removed from firestore.");
     } catch (e) {
         console.error("Error removing all products from firestore: ", e);
     }
 }
 
 async function updateProductInFirestore(docId, newName, newQuantity, isChecked) {
-    if (!currentUser || !navigator.onLine) {
-        console.log("Offline ou sem usuário logado, não atualizando no Firestore.");
-        return;
-    }
+    if (!currentUser) return; // Apenas para usuários logados
     try {
         await window.updateDoc(window.doc(window.db, `users/${currentUser.uid}/shoppingLists`, docId), {
             name: newName,
             quantity: newQuantity,
             checked: isChecked
         });
-        console.log("Product updated in Firestore.");
     } catch (e) {
         console.error("Error updating product in Firestore: ", e);
     }
 }
 
 async function updateProductStateInFirestore(docId, isChecked) {
-    if (!currentUser || !navigator.onLine) {
-        console.log("Offline ou sem usuário logado, não atualizando estado no Firestore.");
-        return;
-    }
+    if (!currentUser) return; // Apenas para usuários logados
     try {
         await window.updateDoc(window.doc(window.db, `users/${currentUser.uid}/shoppingLists`, docId), {
             checked: isChecked
@@ -210,7 +169,7 @@ if (loginForm) {
             await window.signInWithEmailAndPassword(window.auth, email, password);
             closeAnyModal(loginModal);
             localStorage.setItem('welcomeModalSeen', 'true');
-            localStorage.removeItem('shoppingListGuest');
+            localStorage.removeItem('shoppingListGuest'); // Limpa a lista de convidado ao logar
             location.reload(); 
         } catch (error) {
             console.error("login error:", error.message);
@@ -235,7 +194,7 @@ if (signupForm) {
             
             closeAnyModal(signupModal);
             localStorage.setItem('welcomeModalSeen', 'true');
-            localStorage.removeItem('shoppingListGuest');
+            localStorage.removeItem('shoppingListGuest'); // Limpa a lista de convidado ao cadastrar
             
             location.reload();
         } catch (error) {
@@ -247,7 +206,6 @@ if (signupForm) {
 
 if (logoutButton) {
     logoutButton.addEventListener("click", () => {
-        const userUidToClear = currentUser ? currentUser.uid : null;
         window.signOut(window.auth)
             .then(() => {
                 localStorage.removeItem('welcomeModalSeen');
@@ -257,12 +215,8 @@ if (logoutButton) {
                 content.classList.add("scale-in");
                 setTimeout(() => content.classList.remove("scale-in"), 300);
                 document.querySelector(".user-info").classList.add("hidden");
-                clearInterface();
-                if (userUidToClear) {
-                    localStorage.removeItem(`shoppingList_${userUidToClear}`);
-                } else {
-                    localStorage.removeItem('shoppingListGuest');
-                }
+                clearInterface(false); // Não limpa o Firestore, a conta ainda existe
+                localStorage.removeItem('shoppingListGuest'); // Garante que a lista de convidado é limpa
                 location.reload();
             })
             .catch(error => console.error("error logging out:", error.message));
@@ -279,13 +233,7 @@ window.onAuthStateChanged(window.auth, user => {
         logoutButton.classList.remove("display-none");
         if (backToLoginButton) backToLoginButton.classList.add("display-none");
         
-        loadShoppingListFromLocalStorage(); 
-
-        if (navigator.onLine) {
-            loadShoppingListFromFirestoreAndSync(); // Sincroniza com o Firestore se online
-        } else {
-            console.log("Offline: Usando dados locais para o usuário logado.");
-        }
+        loadShoppingListFromFirestore(); // Carrega lista do Firebase (Firestore SDK gerencia cache/sync)
 
     } else {
         currentUser = null;
@@ -295,7 +243,7 @@ window.onAuthStateChanged(window.auth, user => {
         if (backToLoginButton) backToLoginButton.classList.remove("display-none");
         logoutButton.classList.add("display-none");
         
-        loadShoppingListFromLocalStorage();
+        loadShoppingListFromLocalStorageGuest(); // Carrega lista do localStorage (para convidado)
     }
 });
 
@@ -345,7 +293,7 @@ if (guestButton) guestButton.addEventListener('click', () => {
         welcomeModal.classList.add("hidden");
         content.classList.remove("scale-out");
         localStorage.setItem('welcomeModalSeen', 'true');
-        loadShoppingListFromLocalStorage();
+        loadShoppingListFromLocalStorageGuest();
         document.querySelector(".user-info").classList.remove("hidden");
     }, 300);
 });
@@ -436,15 +384,16 @@ function createProductElement(name, quantity, isChecked = false) {
         const isChecked = checkbox.checked;
 
         if (newName && newQuantity > 0) {
-            if (currentUser && navigator.onLine) {
+            if (currentUser) {
                 await updateProductInFirestore(contentArea.dataset.docId, newName, newQuantity, isChecked);
+            } else {
+                saveShoppingListToLocalStorageGuest();
             }
             nameDiv.textContent = newName;
             qtDiv.textContent = newQuantity;
             confirmFadeIn();
             toggleProductEditState(contentArea, false);
             updateProductDisplay(contentArea, isChecked);
-            saveShoppingListToLocalStorage();
         } else {
             errorFadeIn();
         }
@@ -466,13 +415,14 @@ function createProductElement(name, quantity, isChecked = false) {
     const toggleCheckState = () => {
         const isChecked = checkbox.checked;
         updateProductDisplay(contentArea, isChecked);
-        if (currentUser && navigator.onLine) {
+        if (currentUser) {
             const docId = contentArea.dataset.docId;
             if (docId) {
                 updateProductStateInFirestore(docId, isChecked);
             }
+        } else {
+            saveShoppingListToLocalStorageGuest();
         }
-        saveShoppingListToLocalStorage();
     };
 
     productArea.addEventListener('click', (e) => {
@@ -558,14 +508,15 @@ function deleteOneProduct(event) {
         contentArea.classList.add('scale-out');
         playBubbleSound();
         setTimeout(async () => {
-            if (currentUser && navigator.onLine) {
+            if (currentUser) {
                 const docId = contentArea.dataset.docId;
                 if (docId) {
                     await deleteProductFromFirestore(docId);
                 }
+            } else {
+                saveShoppingListToLocalStorageGuest();
             }
             contentArea.remove();
-            saveShoppingListToLocalStorage();
             checkIfInterfaceIsEmpty();
         }, 300);
     }
@@ -616,11 +567,13 @@ async function addNewProduct() {
             const productData = { name: name, quantity: quantity, checked: false };
             let newProductElement = createProductElement(name, quantity, false); 
             
-            if (currentUser && navigator.onLine) {
+            if (currentUser) {
                 const docId = await saveProductToFirestore(productData);
                 if (docId) {
                     newProductElement.dataset.docId = docId;
                 }
+            } else {
+                saveShoppingListToLocalStorageGuest();
             }
             
             shoppingListInterface.appendChild(newProductElement);
@@ -631,7 +584,6 @@ async function addNewProduct() {
             newProductElement.classList.add('scale-in');
             setTimeout(() => {
                 newProductElement.classList.remove('scale-in');
-                saveShoppingListToLocalStorage();
             }, 300);
         }, 300);
     } else {
@@ -655,10 +607,11 @@ function checkIfInterfaceIsEmpty() {
 function clearInterface(clearFromStorage = true) {
     shoppingListInterface.innerHTML = "";
     if (clearFromStorage) {
-        if (currentUser && navigator.onLine) {
+        if (currentUser) {
             deleteAllProductsFromFirestore(); 
+        } else {
+            localStorage.removeItem(getLocalStorageKey());
         }
-        localStorage.removeItem(getLocalStorageKey());
     }
     checkIfInterfaceIsEmpty();
 }
