@@ -36,18 +36,15 @@ const signupWelcomeButton = document.querySelector("#signup-welcome-btn");
 const guestButton = document.querySelector("#guest-btn");
 const logoutButton = document.querySelector("#logout-btn");
 const userGreeting = document.querySelector("#user-greeting");
-const recoverProductsButton = document.querySelector("#recover-prod");
 const closeLoginModalButton = document.querySelector("#close-login-modal");
 const closeSignupModalButton = document.querySelector("#close-signup-modal");
 const backToLoginButton = document.querySelector("#back-to-login-btn");
 
-// Referências para o novo modal de confirmação de limpeza
+// references for clear modal
 const confirmClearModal = document.querySelector("#confirm-clear-modal");
 const confirmClearButton = document.querySelector("#confirm-clear-btn");
 const cancelClearButton = document.querySelector("#cancel-clear-btn");
 const closeConfirmClearModalButton = document.querySelector("#close-confirm-clear-modal");
-
-let isBulkEditMode = false;
 
 let currentUser = null;
 
@@ -198,7 +195,6 @@ window.onAuthStateChanged(window.auth, user => {
         userGreeting.classList.remove("display-none");
         logoutButton.classList.remove("display-none");
         if (backToLoginButton) backToLoginButton.classList.add("display-none");
-        recoverProductsButton.classList.remove("hidden");
         loadShoppingListFromFirestore();
     } else {
         currentUser = null;
@@ -207,7 +203,6 @@ window.onAuthStateChanged(window.auth, user => {
         userGreeting.innerHTML = `Modo <span style="color:#523cb4; font-weight: bold;" >VISITANTE</span>`;
         if (backToLoginButton) backToLoginButton.classList.remove("display-none");
         logoutButton.classList.add("display-none");
-        recoverProductsButton.classList.add("hidden");
         clearInterface(false);
     }
 });
@@ -386,7 +381,6 @@ function createProductElement(name, quantity, isChecked = false) {
     };
 
     productArea.addEventListener('click', (e) => {
-        if (isBulkEditMode) return; 
         if (e.target.closest('.check')) return;
         checkbox.checked = !checkbox.checked;
         toggleCheckState();
@@ -418,11 +412,6 @@ function createProductElement(name, quantity, isChecked = false) {
     contentArea.appendChild(deleteButton);
 
     updateProductDisplay(contentArea, isChecked);
-    
-    if (isBulkEditMode) {
-        toggleProductEditState(contentArea, true);
-    }
-
     return contentArea;
 }
 
@@ -574,28 +563,6 @@ function clearInterface(clearFromStorage = true) {
         }
     }
     checkIfInterfaceIsEmpty();
-}
-
-if (recoverProductsButton) {
-    recoverProductsButton.addEventListener('click', () => {
-        if (!currentUser) {
-            alert("Faça login para usar o modo de edição!");
-            return;
-        }
-
-        isBulkEditMode = !isBulkEditMode;
-
-        const allProducts = document.querySelectorAll('.content-area');
-        allProducts.forEach(productElement => {
-            toggleProductEditState(productElement, isBulkEditMode);
-        });
-
-        if (isBulkEditMode) {
-            recoverProductsButton.style.backgroundColor = '#623ce8';
-        } else {
-            recoverProductsButton.style.backgroundColor = '#414141';
-        }
-    });
 }
 
 addFirstProductButton.addEventListener("click", openModal);
