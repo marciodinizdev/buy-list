@@ -689,6 +689,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
 
+  // Criar botão de instalação
   const installBtn = document.createElement('button');
   installBtn.textContent = "Instalar App";
   installBtn.classList.add("confirm-btn");
@@ -712,4 +713,3 @@ window.addEventListener('beforeinstallprompt', (e) => {
     });
   });
 });
-
