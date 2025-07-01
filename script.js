@@ -64,24 +64,19 @@ function saveShoppingListToLocalStorage() {
             docId: productElement.dataset.docId || null
         });
     });
-    console.log("Salvando lista no localStorage. Chave:", getLocalStorageKey(), "Dados:", products); // Log adicionado
     localStorage.setItem(getLocalStorageKey(), JSON.stringify(products));
 }
 
 function loadShoppingListFromLocalStorage() {
     clearInterface(false);
-    console.log("Tentando carregar lista do localStorage. Chave:", getLocalStorageKey()); // Log adicionado
     const storedList = localStorage.getItem(getLocalStorageKey());
     if (storedList) {
-        console.log("Lista encontrada no localStorage:", storedList); // Log adicionado
         const products = JSON.parse(storedList);
         products.forEach(product => {
             const newProduct = createProductElement(product.name, product.quantity, product.checked);
             newProduct.dataset.docId = product.docId;
             shoppingListInterface.appendChild(newProduct);
         });
-    } else {
-        console.log("Nenhuma lista encontrada no localStorage para a chave:", getLocalStorageKey()); // Log adicionado
     }
     checkIfInterfaceIsEmpty();
 }
@@ -612,7 +607,6 @@ function clearInterface(clearFromStorage = true) {
         if (currentUser) {
             deleteAllProductsFromFirestore(); 
         }
-        console.log("Removendo item do localStorage. Chave:", getLocalStorageKey()); // Log adicionado
         localStorage.removeItem(getLocalStorageKey());
     }
     checkIfInterfaceIsEmpty();
@@ -663,7 +657,6 @@ if (compactListButton) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOMContentLoaded disparado."); // Log adicionado
     checkIfInterfaceIsEmpty();
     
     const welcomeModalSeen = localStorage.getItem('welcomeModalSeen');
@@ -720,3 +713,4 @@ window.addEventListener('beforeinstallprompt', (e) => {
     });
   });
 });
+
