@@ -51,7 +51,6 @@ let isCompactMode = false;
 let currentUser = null;
 
 function getLocalStorageKey() {
-    // Retorna uma chave diferente para usuários logados e o modo convidado
     return currentUser ? `shoppingList_${currentUser.uid}` : 'shoppingListGuest';
 }
 
@@ -62,7 +61,7 @@ function saveShoppingListToLocalStorage() {
             name: productElement.querySelector('.prod-name').textContent,
             quantity: productElement.querySelector('.prod-qt').textContent,
             checked: productElement.querySelector('.prod-checkbox').checked,
-            docId: productElement.dataset.docId || null // Garante que o docId seja salvo
+            docId: productElement.dataset.docId || null
         });
     });
     localStorage.setItem(getLocalStorageKey(), JSON.stringify(products));
@@ -88,15 +87,14 @@ async function saveProductToFirestore(product) {
         return docRef.id;
     } catch (e) {
         console.error("error adding product to firestore: ", e);
-        // Se falhar ao adicionar ao Firestore (ex: offline), retorne null para que o docId não seja atribuído
         return null;
     }
 }
 
 async function loadShoppingListFromFirestore() {
-    clearInterface(false); // Limpa a interface antes de carregar
+    clearInterface(false);
     if (!currentUser) {
-        loadShoppingListFromLocalStorage(); // Se não há usuário logado, carrega apenas do LocalStorage (modo convidado)
+        loadShoppingListFromLocalStorage();
         return;
     }
 
@@ -105,15 +103,13 @@ async function loadShoppingListFromFirestore() {
     let localProducts = storedList ? JSON.parse(storedList) : [];
     let firebaseProducts = [];
 
-    // 1. Carrega produtos do LocalStorage para exibição imediata (cache)
     localProducts.forEach(product => {
         const newProduct = createProductElement(product.name, product.quantity, product.checked);
         newProduct.dataset.docId = product.docId;
         shoppingListInterface.appendChild(newProduct);
     });
-    checkIfInterfaceIsEmpty(); // Atualiza a exibição baseado no que foi carregado do LocalStorage
+    checkIfInterfaceIsEmpty();
 
-    // 2. Tenta carregar do Firestore para sincronização
     try {
         const querySnapshot = await window.getDocs(window.collection(window.db, `users/${currentUser.uid}/shoppingLists`));
         querySnapshot.forEach(doc => {
@@ -122,23 +118,15 @@ async function loadShoppingListFromFirestore() {
             firebaseProducts.push(product);
         });
 
-        // 3. Mesclar LocalStorage com Firestore
         const mergedProductsMap = new Map();
 
-        // Adiciona produtos do Firebase (fonte da verdade para itens com docId)
         firebaseProducts.forEach(prod => mergedProductsMap.set(prod.docId, prod));
 
-        // Adiciona produtos locais. Se já existirem no Firebase pelo docId, o do Firebase prevalece.
-        // Se um produto local não tem docId, ele é uma nova adição offline e será adicionado ao mapa.
         localProducts.forEach(prod => {
             if (prod.docId && mergedProductsMap.has(prod.docId)) {
-                // Produto existe no Firebase, garante que a versão do Firebase é a que está no mapa
-                // Não faz nada aqui, pois o Firebase já foi adicionado
             } else {
-                // Produto local sem docId (novo offline) ou produto local com docId que não está no Firebase (cenário de desync raro)
-                // Usamos uma chave única para garantir que novos produtos offline sejam mantidos até a sincronização.
-                const key = prod.docId || `local_${prod.name}_${prod.quantity}_${Math.random()}`; // Adiciona random para uniqueness
-                if (!mergedProductsMap.has(key)) { // Adiciona apenas se não estiver já presente pelo Firebase docId
+                const key = prod.docId || `local_${prod.name}_${prod.quantity}_${Math.random()}`;
+                if (!mergedProductsMap.has(key)) {
                     mergedProductsMap.set(key, prod);
                 }
             }
@@ -146,13 +134,11 @@ async function loadShoppingListFromFirestore() {
 
         const finalProducts = Array.from(mergedProductsMap.values());
 
-        // 4. Limpa a interface e adiciona os produtos mesclados e sincronizados
-        clearInterface(false); // Limpa novamente para exibir a lista mesclada
+        clearInterface(false);
         for (const product of finalProducts) {
             let docId = product.docId;
-            // Se o produto veio do LocalStorage e não tem docId (foi adicionado offline por usuário logado)
             if (!docId && currentUser) {
-                docId = await saveProductToFirestore(product); // Tenta enviar para o Firestore
+                docId = await saveProductToFirestore(product);
             }
             const newProductElement = createProductElement(product.name, product.quantity, product.checked);
             if (docId) {
@@ -161,13 +147,11 @@ async function loadShoppingListFromFirestore() {
             shoppingListInterface.appendChild(newProductElement);
         }
 
-        saveShoppingListToLocalStorage(); // Salva a lista mesclada e atualizada no LocalStorage
+        saveShoppingListToLocalStorage();
         checkIfInterfaceIsEmpty();
 
     } catch (e) {
         console.error("Erro ao carregar lista do Firestore (pode estar offline):", e);
-        // Se houver um erro ao carregar do Firestore (ex: offline),
-        // a lista já foi carregada do LocalStorage no início da função, então nada mais precisa ser feito aqui.
     }
 }
 
@@ -176,9 +160,6 @@ async function deleteProductFromFirestore(docId) {
         await window.deleteDoc(window.doc(window.db, `users/${currentUser.uid}/shoppingLists`, docId));
     } catch (e) {
         console.error("error removing product from firestore: ", e);
-        // Em caso de falha (offline), o item será removido localmente, mas não do Firestore.
-        // A sincronização de exclusões é mais complexa e exigiria um mecanismo de "fila de operações" offline.
-        // Para este escopo, a remoção local é priorizada.
     }
 }
 
@@ -194,8 +175,6 @@ async function deleteAllProductsFromFirestore() {
         await Promise.all(deletePromises);
     } catch (e) {
         console.error("Error removing all products from firestore: ", e);
-        // Em caso de falha (offline), a lista será limpa localmente, mas não do Firestore.
-        // Similar à exclusão individual, uma fila de operações seria necessária para sincronização total.
     }
 }
 
@@ -208,8 +187,6 @@ async function updateProductInFirestore(docId, newName, newQuantity, isChecked) 
         });
     } catch (e) {
         console.error("Error updating product in Firestore: ", e);
-        // Em caso de falha (offline), a atualização ocorrerá localmente, mas não no Firestore.
-        // Para sincronizar, você precisaria marcar o item como "pendente de sincronização" e tentar novamente depois.
     }
 }
 
@@ -220,7 +197,6 @@ async function updateProductStateInFirestore(docId, isChecked) {
         });
     } catch (e) {
         console.error("error updating product state in firestore: ", e);
-        // Em caso de falha (offline), a atualização ocorrerá localmente, mas não no Firestore.
     }
 }
 
@@ -233,8 +209,8 @@ if (loginForm) {
             await window.signInWithEmailAndPassword(window.auth, email, password);
             closeAnyModal(loginModal);
             localStorage.setItem('welcomeModalSeen', 'true');
-            localStorage.removeItem('shoppingListGuest'); // Limpa a lista de convidado ao logar
-            location.reload(); // Recarrega para garantir o carregamento correto da lista do usuário
+            localStorage.removeItem('shoppingListGuest');
+            location.reload();
         } catch (error) {
             console.error("login error:", error.message);
             alert("login error: " + error.message);
@@ -258,7 +234,7 @@ if (signupForm) {
             
             closeAnyModal(signupModal);
             localStorage.setItem('welcomeModalSeen', 'true');
-            localStorage.removeItem('shoppingListGuest'); // Limpa a lista de convidado ao cadastrar
+            localStorage.removeItem('shoppingListGuest');
             
             location.reload();
         } catch (error) {
@@ -279,9 +255,8 @@ if (logoutButton) {
                 content.classList.add("scale-in");
                 setTimeout(() => content.classList.remove("scale-in"), 300);
                 document.querySelector(".user-info").classList.add("hidden");
-                // Não limpa o LocalStorage do usuário logado aqui, pois ele será sobrescrito pelo modo convidado
-                clearInterface(false); // Limpa a interface, mas não o armazenamento
-                location.reload(); // Recarrega para mudar para o modo convidado
+                clearInterface(false);
+                location.reload();
             })
             .catch(error => console.error("error logging out:", error.message));
     });
@@ -296,7 +271,7 @@ window.onAuthStateChanged(window.auth, user => {
         userGreeting.classList.remove("display-none");
         logoutButton.classList.remove("display-none");
         if (backToLoginButton) backToLoginButton.classList.add("display-none");
-        loadShoppingListFromFirestore(); // Carrega lista do Firestore (que agora usa LocalStorage como cache)
+        loadShoppingListFromFirestore();
     } else {
         currentUser = null;
         document.querySelector(".user-info").classList.remove("hidden");
@@ -304,7 +279,7 @@ window.onAuthStateChanged(window.auth, user => {
         userGreeting.innerHTML = `Modo <span style="color:#523cb4; font-weight: bold;" >VISITANTE</span>`;
         if (backToLoginButton) backToLoginButton.classList.remove("display-none");
         logoutButton.classList.add("display-none");
-        loadShoppingListFromLocalStorage(); // Carrega lista do LocalStorage para modo convidado
+        loadShoppingListFromLocalStorage();
     }
 });
 
@@ -343,7 +318,6 @@ function openConfirmClearModal() {
         modalContentElement.classList.remove("scale-in");
     }, 300);
 }
-
 
 if (loginWelcomeButton) loginWelcomeButton.addEventListener('click', openLoginModal);
 if (signupWelcomeButton) signupWelcomeButton.addEventListener('click', openSignupModal);
@@ -445,7 +419,7 @@ function createProductElement(name, quantity, isChecked = false) {
         const isChecked = checkbox.checked;
 
         if (newName && newQuantity > 0) {
-            if (currentUser && contentArea.dataset.docId) { // Só tenta atualizar o Firestore se tiver docId
+            if (currentUser && contentArea.dataset.docId) {
                 await updateProductInFirestore(contentArea.dataset.docId, newName, newQuantity, isChecked);
             }
             nameDiv.textContent = newName;
@@ -453,7 +427,7 @@ function createProductElement(name, quantity, isChecked = false) {
             confirmFadeIn();
             toggleProductEditState(contentArea, false);
             updateProductDisplay(contentArea, isChecked);
-            saveShoppingListToLocalStorage(); // Sempre salva no LocalStorage após edição
+            saveShoppingListToLocalStorage();
         } else {
             errorFadeIn();
         }
@@ -475,13 +449,13 @@ function createProductElement(name, quantity, isChecked = false) {
     const toggleCheckState = () => {
         const isChecked = checkbox.checked;
         updateProductDisplay(contentArea, isChecked);
-        if (currentUser && contentArea.dataset.docId) { // Só tenta atualizar o Firestore se tiver docId
+        if (currentUser && contentArea.dataset.docId) {
             const docId = contentArea.dataset.docId;
             if (docId) {
                 updateProductStateInFirestore(docId, isChecked);
             }
         }
-        saveShoppingListToLocalStorage(); // Sempre salva no LocalStorage após mudança de estado
+        saveShoppingListToLocalStorage();
     };
 
     productArea.addEventListener('click', (e) => {
@@ -567,14 +541,14 @@ function deleteOneProduct(event) {
         contentArea.classList.add('scale-out');
         playBubbleSound();
         setTimeout(async () => {
-            if (currentUser && contentArea.dataset.docId) { // Só tenta deletar do Firestore se tiver docId
+            if (currentUser && contentArea.dataset.docId) {
                 const docId = contentArea.dataset.docId;
                 if (docId) {
                     await deleteProductFromFirestore(docId);
                 }
             }
             contentArea.remove();
-            saveShoppingListToLocalStorage(); // Sempre salva no LocalStorage após exclusão
+            saveShoppingListToLocalStorage();
             checkIfInterfaceIsEmpty();
         }, 300);
     }
@@ -627,12 +601,11 @@ async function addNewProduct() {
             let docId = null;
 
             if (currentUser) {
-                docId = await saveProductToFirestore(productData); // Tenta salvar no Firestore
+                docId = await saveProductToFirestore(productData);
             }
-            // Cria o elemento na interface, independentemente de ter um docId ou não
             newProductElement = createProductElement(name, quantity, false); 
             if (docId) {
-                newProductElement.dataset.docId = docId; // Atribui o docId se a operação no Firestore foi bem-sucedida
+                newProductElement.dataset.docId = docId;
             }
             
             shoppingListInterface.appendChild(newProductElement);
@@ -643,7 +616,7 @@ async function addNewProduct() {
             newProductElement.classList.add('scale-in');
             setTimeout(() => {
                 newProductElement.classList.remove('scale-in');
-                saveShoppingListToLocalStorage(); // Sempre salva no LocalStorage após adicionar
+                saveShoppingListToLocalStorage();
             }, 300);
         }, 300);
     } else {
@@ -668,9 +641,9 @@ function clearInterface(clearFromStorage = true) {
     shoppingListInterface.innerHTML = "";
     if (clearFromStorage) {
         if (currentUser) {
-            deleteAllProductsFromFirestore(); // Tenta apagar todos os produtos do Firestore
+            deleteAllProductsFromFirestore();
         }
-        localStorage.removeItem(getLocalStorageKey()); // Sempre remove do LocalStorage, independentemente de estar logado ou não
+        localStorage.removeItem(getLocalStorageKey());
     }
     checkIfInterfaceIsEmpty();
 }

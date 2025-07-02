@@ -57,7 +57,7 @@
         </span>
     </div>
     <footer>
-        
+
         <div>
             <div id="btn-area">
                 <button id="add-prod" class="interface-btn">
@@ -86,7 +86,6 @@
                     close
                 </span>
             </button>
-
             <div class="fields">
                 <h3>Adicionar Produtos</h3>
                 <div>
@@ -98,14 +97,12 @@
                     <span>Quantos?</span>
                     <input id="qtd-field" type="number" min="1" max="99" value="1"
                         oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 2)" />
-
                 </div>
                 <button id="ok-modal" class="confirm-btn">Adicionar</button>
             </div>
-
         </div>
     </div>
-    
+
     <div id="welcome-modal" class="modal">
         <div class="modal-content">
             <div class="fields">
@@ -159,7 +156,8 @@
                     </div>
                     <div>
                         <span>Senha:</span>
-                        <input type="password" name="password" id="signup-password" placeholder="Mínimo 6 caracteres" required>
+                        <input type="password" name="password" id="signup-password" placeholder="Mínimo 6 caracteres"
+                            required>
                     </div>
                     <button type="submit" class="confirm-btn">Cadastrar</button>
                 </form>
@@ -179,7 +177,7 @@
             </div>
         </div>
     </div>
-    
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
@@ -209,7 +207,7 @@
         window.deleteDoc = deleteDoc;
         window.updateDoc = updateDoc;
     </script>
-    
+
     <script src="script.js" type="module"></script>
 </body>
 
